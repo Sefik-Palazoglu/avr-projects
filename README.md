@@ -27,3 +27,19 @@ Clone the repository
 
 `git clone git@github.com:Sefik-Palazoglu/avr-projects.git`
 
+## AVR related steps
+### Installing `binutils-avr`
+run `sudo apt install binutils-avr`
+
+Notable tools from this package:
+- `/usr/bin/avr-ar`
+- `/usr/bin/avr-as`
+- `/usr/bin/avr-ld`
+- `/usr/bin/avr-nm`
+- `/usr/bin/avr-objcopy`
+- `/usr/bin/avr-objdump`
+- `/usr/bin/avr-readelf`
+- `/usr/bin/avr-strip`
+
+### installing `gcc-avr`
+run `sudo apt install gcc-avr`
