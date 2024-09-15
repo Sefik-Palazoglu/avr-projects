@@ -43,3 +43,10 @@ Notable tools from this package:
 
 ### installing `gcc-avr`
 run `sudo apt install gcc-avr`
+
+Notable tools from this package:
+- `/usr/lib/gcc/avr/7.3.0/device-specs`
+- `/usr/bin/avr-gcc`
+- `/usr/bin/avr-gcc-ar`
+- `/usr/bin/avr-gcc-nm`
+
