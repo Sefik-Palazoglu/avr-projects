@@ -107,3 +107,4 @@ Then, run `sudo dmesg` again after plugging in Arduino Uno. And examine the last
 [ 1966.045580] ch341 1-1:1.0: ch341-uart converter detected
 [ 1966.045982] usb 1-1: ch341-uart converter now attached to ttyUSB0
 ```
+This output means the board is attached to `/dev/ttyUSB0`
