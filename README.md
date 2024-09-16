@@ -125,3 +125,10 @@ This output means the board is attached to `/dev/ttyUSB0`
 After learning the usb port of the plugged in you can use `upload_hex_via_usb.sh`. It uses `/dev/ttyUSB0` by default, if yours is different edit and change the script!
 
 Example usage: `sudo ../upload_scripts/upload_hex_via_usb.sh ./main.hex` 
+
+### Pull the flash memory to a file as .hex format
+`sudo avrdude -C /etc/avrdude.conf -v -V -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -D -U flash:r:./file:i`
+
+### Disassemble the pulled hex file
+`avr-objdump -d ./file -j .sec1 -m avr:5 > file.dump`
+
