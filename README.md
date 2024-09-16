@@ -90,6 +90,18 @@ Notable tools from this package:
 - `/usr/lib/avr/lib/avr5/libm.a`
 - `/usr/lib/avr/lib/avr5/libm3000.a`
 
+### Installing `avrdude`
+avrdude is a program for uploading and downloading form avr board.
+
+Run
+`sudo apt install avrdude`
+
+This installs
+- `avrdude`
+- `libftdi1`
+- `libhidapi-libusb0`
+- `libusb-0.1-4`
+
 ## What to do after plugging in an avr board like an Arduino Uno?
 run `sudo dmesg` before plugging in Arduino Uno.
 
@@ -108,3 +120,8 @@ Then, run `sudo dmesg` again after plugging in Arduino Uno. And examine the last
 [ 1966.045982] usb 1-1: ch341-uart converter now attached to ttyUSB0
 ```
 This output means the board is attached to `/dev/ttyUSB0`
+
+## What next?
+After learning the usb port of the plugged in you can use `upload_hex_via_usb.sh`. It uses `/dev/ttyUSB0` by default, if yours is different edit and change the script!
+
+Example usage: `sudo ../upload_scripts/upload_hex_via_usb.sh ./main.hex` 
