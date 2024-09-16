@@ -132,3 +132,5 @@ Example usage: `sudo ../upload_scripts/upload_hex_via_usb.sh ./main.hex`
 ### Disassemble the pulled hex file
 `avr-objdump -d ./file -j .sec1 -m avr:5 > file.dump`
 
+#### Disassemble the tiny bootloader section
+`avr-objdump -d ./file -j .sec1 -m avr:5 --start-address=0x7e00 > bootloader.dump`
