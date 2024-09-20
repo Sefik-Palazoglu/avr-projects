@@ -5,23 +5,25 @@
 Disassembly of section .sec1:
 
 00007e00 <.sec1+0x7e00>:
-    7e00:	11 24       	eor	r1, r1
-    7e02:	84 b7       	in	r24, 0x34	; 52
-    7e04:	14 be       	out	0x34, r1	; 52
-    7e06:	81 ff       	sbrs	r24, 1
-    7e08:	f0 d0       	rcall	.+480    	;  0x7fea
-    7e0a:	85 e0       	ldi	r24, 0x05	; 5
-    7e0c:	80 93 81 00 	sts	0x0081, r24	;  0x800081
-    7e10:	82 e0       	ldi	r24, 0x02	; 2
-    7e12:	80 93 c0 00 	sts	0x00C0, r24	;  0x8000c0
-    7e16:	88 e1       	ldi	r24, 0x18	; 24
-    7e18:	80 93 c1 00 	sts	0x00C1, r24	;  0x8000c1
-    7e1c:	86 e0       	ldi	r24, 0x06	; 6
-    7e1e:	80 93 c2 00 	sts	0x00C2, r24	;  0x8000c2
-    7e22:	80 e1       	ldi	r24, 0x10	; 16
-    7e24:	80 93 c4 00 	sts	0x00C4, r24	;  0x8000c4
-    7e28:	8e e0       	ldi	r24, 0x0E	; 14
-    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe
+    7e00:	11 24       	eor	r1, r1                          # r1 = 0
+    7e02:	84 b7       	in	r24, 0x34	; 52                # MCUSR_OLD = get_MCUSR()
+    7e04:	14 be       	out	0x34, r1	; 52                # set_MCUSR(0)
+    7e06:	81 ff       	sbrs	r24, 1                      # if (EXTRF is not set) call 0x7fea
+    7e08:	f0 d0       	rcall	.+480    	;  0x7fea       # else continue on Init_Bootloader
+    Init_Bootloader:
+    Init_UART:
+    7e0a:	85 e0       	ldi	r24, 0x05	; 5                 # r24 = 5
+    7e0c:	80 93 81 00 	sts	0x0081, r24	;  0x800081         # TCCR1B =  CS12 | CS10  `clk_I/O / 1024 (from prescaler)`
+    7e10:	82 e0       	ldi	r24, 0x02	; 2                 # r24 = 2
+    7e12:	80 93 c0 00 	sts	0x00C0, r24	;  0x8000c0         # UCSR0A = U2Xn `Double the USART Transmission Speed`
+    7e16:	88 e1       	ldi	r24, 0x18	; 24                # r24 = 0x18
+    7e18:	80 93 c1 00 	sts	0x00C1, r24	;  0x8000c1         # UCSR0B =  RXENn | TXENn `Receiver Enable and Transmitter Enable`
+    7e1c:	86 e0       	ldi	r24, 0x06	; 6                 # r24 = 0x06
+    7e1e:	80 93 c2 00 	sts	0x00C2, r24	;  0x8000c2         # UCSRnC = UCSZn1 | UCSZn0 `Character Size = 8 bits`
+    7e22:	80 e1       	ldi	r24, 0x10	; 16                # r24 = 0x10
+    7e24:	80 93 c4 00 	sts	0x00C4, r24	;  0x8000c4         # UBRR0 = 0x010 `Up until now, makes baud rate 115200`
+    7e28:	8e e0       	ldi	r24, 0x0E	; 14                # r24 = 0x0E
+    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe       # call 0x7fbe
     7e2c:	25 9a       	sbi	0x04, 5	; 4
     7e2e:	86 e0       	ldi	r24, 0x06	; 6
     7e30:	20 e3       	ldi	r18, 0x30	; 48
