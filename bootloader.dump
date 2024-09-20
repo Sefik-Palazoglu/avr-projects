@@ -218,11 +218,12 @@ Disassembly of section .sec1:
     7fb6:	a8 95       	wdr
     7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6
     7fbc:	08 95       	ret
-    7fbe:	e0 e6       	ldi	r30, 0x60	; 96
-    7fc0:	f0 e0       	ldi	r31, 0x00	; 0
-    7fc2:	98 e1       	ldi	r25, 0x18	; 24
-    7fc4:	90 83       	st	Z, r25
-    7fc6:	80 83       	st	Z, r24
+    Disable_Watchdog_Timer():
+    7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
+    7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = WDTCSR
+    7fc2:	98 e1       	ldi	r25, 0x18	; 24                # r25 = 0x18
+    7fc4:	90 83       	st	Z, r25                          # [WDTCSR] = 0x18
+    7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = 0x00
     7fc8:	08 95       	ret
     7fca:	ed df       	rcall	.-38     	;  0x7fa6
     7fcc:	80 32       	cpi	r24, 0x20	; 32
@@ -240,11 +241,11 @@ Disassembly of section .sec1:
     7fe4:	f2 df       	rcall	.-28     	;  0x7fca
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
-    7fea:	80 e0       	ldi	r24, 0x00	; 0
-    7fec:	e8 df       	rcall	.-48     	;  0x7fbe
+    7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0
+    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Disable_Watchdog_Timer()
     7fee:	ee 27       	eor	r30, r30
     7ff0:	ff 27       	eor	r31, r31
-    7ff2:	09 94       	ijmp
+    7ff2:	09 94       	ijmp                               # jump to zero
     7ff4:	ff ff       	.word	0xffff	; ????
     7ff6:	ff ff       	.word	0xffff	; ????
     7ff8:	ff ff       	.word	0xffff	; ????
