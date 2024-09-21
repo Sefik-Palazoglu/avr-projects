@@ -38,22 +38,22 @@ Disassembly of section .sec1:
     7e46:	a8 95       	wdr                                 # Watchdog Reset
     7e48:	81 50       	subi	r24, 0x01	; 1             # decrement loop counter
     7e4a:	a9 f7       	brne	.-22     	;  0x7e36       # return loop to TCNT1 set
-    7e4c:	cc 24       	eor	r12, r12
-    7e4e:	dd 24       	eor	r13, r13
-    7e50:	88 24       	eor	r8, r8
-    7e52:	83 94       	inc	r8
-    7e54:	b5 e0       	ldi	r27, 0x05	; 5
-    7e56:	ab 2e       	mov	r10, r27
-    7e58:	a1 e1       	ldi	r26, 0x11	; 17
-    7e5a:	9a 2e       	mov	r9, r26
-    7e5c:	f3 e0       	ldi	r31, 0x03	; 3
-    7e5e:	bf 2e       	mov	r11, r31
-    7e60:	a2 d0       	rcall	.+324    	;  0x7fa6
-    7e62:	81 34       	cpi	r24, 0x41	; 65
-    7e64:	61 f4       	brne	.+24     	;  0x7e7e
-    7e66:	9f d0       	rcall	.+318    	;  0x7fa6
-    7e68:	08 2f       	mov	r16, r24
-    7e6a:	af d0       	rcall	.+350    	;  0x7fca
+    7e4c:	cc 24       	eor	r12, r12                        # r12 = 0
+    7e4e:	dd 24       	eor	r13, r13                        # r13 = 0
+    7e50:	88 24       	eor	r8, r8                          # r8 = 0
+    7e52:	83 94       	inc	r8                              # r8++
+    7e54:	b5 e0       	ldi	r27, 0x05	; 5                 # r27 = 0x05
+    7e56:	ab 2e       	mov	r10, r27                        # r10 = r27
+    7e58:	a1 e1       	ldi	r26, 0x11	; 17                # r26 = 0x11
+    7e5a:	9a 2e       	mov	r9, r26                         # r9 = r26
+    7e5c:	f3 e0       	ldi	r31, 0x03	; 3                 # r31 = 0x03
+    7e5e:	bf 2e       	mov	r11, r31                        # r11 = r31
+    7e60:	a2 d0       	rcall	.+324    	;  0x7fa6       # r24 = Read_USART()
+    7e62:	81 34       	cpi	r24, 0x41	; 65                # compare USART with 0x41
+    7e64:	61 f4       	brne	.+24     	;  0x7e7e       # Not 0x41, Go to 0x7e7e
+    7e66:	9f d0       	rcall	.+318    	;  0x7fa6       # 0x41, r24 = Read_USART()
+    7e68:	08 2f       	mov	r16, r24                        # r16 = r24, last read USART
+    7e6a:	af d0       	rcall	.+350    	;  0x7fca       # call 0x7fca(r24 = last read USART)
     7e6c:	02 38       	cpi	r16, 0x82	; 130
     7e6e:	11 f0       	breq	.+4      	;  0x7e74
     7e70:	01 38       	cpi	r16, 0x81	; 129
@@ -63,14 +63,14 @@ Disassembly of section .sec1:
     7e78:	83 e0       	ldi	r24, 0x03	; 3
     7e7a:	8d d0       	rcall	.+282    	;  0x7f96
     7e7c:	89 c0       	rjmp	.+274    	;  0x7f90
-    7e7e:	82 34       	cpi	r24, 0x42	; 66
+    7e7e:	82 34       	cpi	r24, 0x42	; 66                # is 0x42?
     7e80:	11 f4       	brne	.+4      	;  0x7e86
-    7e82:	84 e1       	ldi	r24, 0x14	; 20
-    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c
-    7e86:	85 34       	cpi	r24, 0x45	; 69
+    7e82:	84 e1       	ldi	r24, 0x14	; 20                # was 0x42.
+    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c       0x7e8c(0x14)
+    7e86:	85 34       	cpi	r24, 0x45	; 69                # was not 0x042.
     7e88:	19 f4       	brne	.+6      	;  0x7e90
     7e8a:	85 e0       	ldi	r24, 0x05	; 5
-    7e8c:	a6 d0       	rcall	.+332    	;  0x7fda
+    7e8c:	a6 d0       	rcall	.+332    	;  0x7fda       # 
     7e8e:	80 c0       	rjmp	.+256    	;  0x7f90
     7e90:	85 35       	cpi	r24, 0x55	; 85
     7e92:	79 f4       	brne	.+30     	;  0x7eb2
@@ -203,20 +203,22 @@ Disassembly of section .sec1:
     7f90:	80 e1       	ldi	r24, 0x10	; 16
     7f92:	01 d0       	rcall	.+2      	;  0x7f96
     7f94:	65 cf       	rjmp	.-310    	;  0x7e60
-    7f96:	98 2f       	mov	r25, r24
-    7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0
-    7f9c:	85 ff       	sbrs	r24, 5
-    7f9e:	fc cf       	rjmp	.-8      	;  0x7f98
-    7fa0:	90 93 c6 00 	sts	0x00C6, r25	;  0x8000c6
+    Write_USART(r24)
+    7f96:	98 2f       	mov	r25, r24                        # r25 = r24
+    7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A  
+    7f9c:	85 ff       	sbrs	r24, 5                      # skip if USART Data Register Empty
+    7f9e:	fc cf       	rjmp	.-8      	;  0x7f98       # loop until USART Data Register Empty
+    7fa0:	90 93 c6 00 	sts	0x00C6, r25	;  0x8000c6         # Write to USART IO Data Register
     7fa4:	08 95       	ret
-    7fa6:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0
-    7faa:	87 ff       	sbrs	r24, 7
-    7fac:	fc cf       	rjmp	.-8      	;  0x7fa6
-    7fae:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0
-    7fb2:	84 fd       	sbrc	r24, 4
-    7fb4:	01 c0       	rjmp	.+2      	;  0x7fb8
-    7fb6:	a8 95       	wdr
-    7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6
+    r24 = Read_USART():
+    7fa6:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A 
+    7faa:	87 ff       	sbrs	r24, 7                      # skip if USART Receive Complete
+    7fac:	fc cf       	rjmp	.-8      	;  0x7fa6       # loop until receive complete
+    7fae:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A 
+    7fb2:	84 fd       	sbrc	r24, 4                      # skip if Frame Error Cleared
+    7fb4:	01 c0       	rjmp	.+2      	;  0x7fb8       # Frame Error, skip watchdog reset
+    7fb6:	a8 95       	wdr                                 # no Frame Error, watchdog reset
+    7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6         # read r24 = USART I/O Data Register
     7fbc:	08 95       	ret
     Configure_Watchdog_Timer(r24):
     7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
@@ -225,20 +227,21 @@ Disassembly of section .sec1:
     7fc4:	90 83       	st	Z, r25                          # [WDTCSR] = 0x18
     7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = r24
     7fc8:	08 95       	ret
-    7fca:	ed df       	rcall	.-38     	;  0x7fa6
-    7fcc:	80 32       	cpi	r24, 0x20	; 32
+    x(r24)
+    7fca:	ed df       	rcall	.-38     	;  0x7fa6       # r24 = Read_USART()
+    7fcc:	80 32       	cpi	r24, 0x20	; 32                # r24 ?= 0x20
     7fce:	19 f0       	breq	.+6      	;  0x7fd6
-    7fd0:	88 e0       	ldi	r24, 0x08	; 8
-    7fd2:	f5 df       	rcall	.-22     	;  0x7fbe
-    7fd4:	ff cf       	rjmp	.-2      	;  0x7fd4
-    7fd6:	84 e1       	ldi	r24, 0x14	; 20
-    7fd8:	de cf       	rjmp	.-68     	;  0x7f96
-    7fda:	1f 93       	push	r17
-    7fdc:	18 2f       	mov	r17, r24
-    7fde:	e3 df       	rcall	.-58     	;  0x7fa6
-    7fe0:	11 50       	subi	r17, 0x01	; 1
-    7fe2:	e9 f7       	brne	.-6      	;  0x7fde
-    7fe4:	f2 df       	rcall	.-28     	;  0x7fca
+    7fd0:	88 e0       	ldi	r24, 0x08	; 8                 # r24 = 0x08
+    7fd2:	f5 df       	rcall	.-22     	;  0x7fbe       # Configure_Watchdog_Timer(0x08) // system reset from watchdog enable
+    7fd4:	ff cf       	rjmp	.-2      	;  0x7fd4       # loop until Watchdog System Reset
+    7fd6:	84 e1       	ldi	r24, 0x14	; 20                # r24 = 0x14
+    7fd8:	de cf       	rjmp	.-68     	;  0x7f96       # Write_USART(0x14)
+    7fda:	1f 93       	push	r17                         # push r17
+    7fdc:	18 2f       	mov	r17, r24                        # r17 = r24
+    7fde:	e3 df       	rcall	.-58     	;  0x7fa6       # r24 = Read_USART()
+    7fe0:	11 50       	subi	r17, 0x01	; 1             # r17--;
+    7fe2:	e9 f7       	brne	.-6      	;  0x7fde       # Loop until r17 == 0
+    7fe4:	f2 df       	rcall	.-28     	;  0x7fca       # x()
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
     Go_To_Application_Start():
