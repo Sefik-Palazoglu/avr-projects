@@ -23,21 +23,21 @@ Disassembly of section .sec1:
     7e22:	80 e1       	ldi	r24, 0x10	; 16                # r24 = 0x10
     7e24:	80 93 c4 00 	sts	0x00C4, r24	;  0x8000c4         # UBRR0 = 0x010 `Up until now, makes baud rate 115200`
     7e28:	8e e0       	ldi	r24, 0x0E	; 14                # r24 = 0x0E
-    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe       # call 0x7fbe
-    7e2c:	25 9a       	sbi	0x04, 5	; 4
-    7e2e:	86 e0       	ldi	r24, 0x06	; 6
-    7e30:	20 e3       	ldi	r18, 0x30	; 48
-    7e32:	3c ef       	ldi	r19, 0xFC	; 252
-    7e34:	91 e0       	ldi	r25, 0x01	; 1
-    7e36:	30 93 85 00 	sts	0x0085, r19	;  0x800085
-    7e3a:	20 93 84 00 	sts	0x0084, r18	;  0x800084
-    7e3e:	96 bb       	out	0x16, r25	; 22
-    7e40:	b0 9b       	sbis	0x16, 0	; 22
-    7e42:	fe cf       	rjmp	.-4      	;  0x7e40
-    7e44:	1d 9a       	sbi	0x03, 5	; 3
-    7e46:	a8 95       	wdr
-    7e48:	81 50       	subi	r24, 0x01	; 1
-    7e4a:	a9 f7       	brne	.-22     	;  0x7e36
+    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe       # call Configure_Watchdog_Timer(0x0E) //  WDP2 | WDP1 Reset on Timeout, 128K cycles = 1.0s timeout time
+    7e2c:	25 9a       	sbi	0x04, 5	; 4                     # Set PORTB 5 to output
+    7e2e:	86 e0       	ldi	r24, 0x06	; 6                 # r24 = 0x06
+    7e30:	20 e3       	ldi	r18, 0x30	; 48                # r18 = 0x30
+    7e32:	3c ef       	ldi	r19, 0xFC	; 252               # r19 = 0xFC
+    7e34:	91 e0       	ldi	r25, 0x01	; 1                 # r25 = 0x01
+    7e36:	30 93 85 00 	sts	0x0085, r19	;  0x800085         # 
+    7e3a:	20 93 84 00 	sts	0x0084, r18	;  0x800084         # TCNT1 = 0xFC30 = 64560
+    7e3e:	96 bb       	out	0x16, r25	; 22                # TIFR1 = 0x01 = Timer 1 Overflow Flag Clear
+    7e40:	b0 9b       	sbis	0x16, 0	; 22                # Skip if TOV1 is set
+    7e42:	fe cf       	rjmp	.-4      	;  0x7e40       # spin wait until TCNT1 overflows ((65536 - 64560) * 1024 / 16.000.000) = 0.06 seconds
+    7e44:	1d 9a       	sbi	0x03, 5	; 3                     # Toggle PortB[5] Output pin
+    7e46:	a8 95       	wdr                                 # Watchdog Reset
+    7e48:	81 50       	subi	r24, 0x01	; 1             # decrement loop counter
+    7e4a:	a9 f7       	brne	.-22     	;  0x7e36       # return loop to TCNT1 set
     7e4c:	cc 24       	eor	r12, r12
     7e4e:	dd 24       	eor	r13, r13
     7e50:	88 24       	eor	r8, r8
@@ -218,12 +218,12 @@ Disassembly of section .sec1:
     7fb6:	a8 95       	wdr
     7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6
     7fbc:	08 95       	ret
-    Disable_Watchdog_Timer():
+    Configure_Watchdog_Timer(r24):
     7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
     7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = WDTCSR
     7fc2:	98 e1       	ldi	r25, 0x18	; 24                # r25 = 0x18
     7fc4:	90 83       	st	Z, r25                          # [WDTCSR] = 0x18
-    7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = 0x00
+    7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = r24
     7fc8:	08 95       	ret
     7fca:	ed df       	rcall	.-38     	;  0x7fa6
     7fcc:	80 32       	cpi	r24, 0x20	; 32
@@ -241,8 +241,9 @@ Disassembly of section .sec1:
     7fe4:	f2 df       	rcall	.-28     	;  0x7fca
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
+    Go_To_Application_Start():
     7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0
-    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Disable_Watchdog_Timer()
+    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // disable
     7fee:	ee 27       	eor	r30, r30
     7ff0:	ff 27       	eor	r31, r31
     7ff2:	09 94       	ijmp                               # jump to zero
