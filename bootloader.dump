@@ -53,62 +53,62 @@ Disassembly of section .sec1:
     7e64:	61 f4       	brne	.+24     	;  0x7e7e       # Not 0x41, Go to 0x7e7e
     7e66:	9f d0       	rcall	.+318    	;  0x7fa6       # 0x41, r24 = Read_USART()
     7e68:	08 2f       	mov	r16, r24                        # r16 = r24, last read USART
-    7e6a:	af d0       	rcall	.+350    	;  0x7fca       # call 0x7fca(r24 = last read USART)
-    7e6c:	02 38       	cpi	r16, 0x82	; 130
-    7e6e:	11 f0       	breq	.+4      	;  0x7e74
-    7e70:	01 38       	cpi	r16, 0x81	; 129
-    7e72:	11 f4       	brne	.+4      	;  0x7e78
-    7e74:	84 e0       	ldi	r24, 0x04	; 4
-    7e76:	01 c0       	rjmp	.+2      	;  0x7e7a
-    7e78:	83 e0       	ldi	r24, 0x03	; 3
-    7e7a:	8d d0       	rcall	.+282    	;  0x7f96
-    7e7c:	89 c0       	rjmp	.+274    	;  0x7f90
+    7e6a:	af d0       	rcall	.+350    	;  0x7fca       # call read_another_0x20_and_write_0x14()
+    7e6c:	02 38       	cpi	r16, 0x82	; 130               # check if previously read 0x82
+    7e6e:	11 f0       	breq	.+4      	;  0x7e74       # 
+    7e70:	01 38       	cpi	r16, 0x81	; 129               # check if previously read 0x81
+    7e72:	11 f4       	brne	.+4      	;  0x7e78       # 
+    7e74:	84 e0       	ldi	r24, 0x04	; 4                 # 
+    7e76:	01 c0       	rjmp	.+2      	;  0x7e7a       # Previously read was 0x82 or 0x81, call Write_USART(r24 = 0x04)
+    7e78:	83 e0       	ldi	r24, 0x03	; 3                 # Previously read was not 0x81 or 0x82. call Write_USART(r24 = 0x03)
+    7e7a:	8d d0       	rcall	.+282    	;  0x7f96       # actually call Write_USART(r24)
+    7e7c:	89 c0       	rjmp	.+274    	;  0x7f90       # jmp to [Write 0x10 and go back to reading 0x41]
     7e7e:	82 34       	cpi	r24, 0x42	; 66                # is 0x42?
     7e80:	11 f4       	brne	.+4      	;  0x7e86
-    7e82:	84 e1       	ldi	r24, 0x14	; 20                # was 0x42.
-    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c       0x7e8c(0x14)
-    7e86:	85 34       	cpi	r24, 0x45	; 69                # was not 0x042.
+    7e82:	84 e1       	ldi	r24, 0x14	; 20                # was 0x42. r24 = 0x14
+    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c       # call Read_N_Characters(r24 = 0x14)
+    7e86:	85 34       	cpi	r24, 0x45	; 69                # was not 0x42. check if r24 == 0x45
     7e88:	19 f4       	brne	.+6      	;  0x7e90
-    7e8a:	85 e0       	ldi	r24, 0x05	; 5
-    7e8c:	a6 d0       	rcall	.+332    	;  0x7fda       # 
-    7e8e:	80 c0       	rjmp	.+256    	;  0x7f90
-    7e90:	85 35       	cpi	r24, 0x55	; 85
+    7e8a:	85 e0       	ldi	r24, 0x05	; 5                 # was 0x45. call Read_N_Characters(r24 = 0x05)
+    7e8c:	a6 d0       	rcall	.+332    	;  0x7fda       # call Read_N_Characters(r24)
+    7e8e:	80 c0       	rjmp	.+256    	;  0x7f90       # jmp to [Write 0x10 and go back to reading 0x41]
+    7e90:	85 35       	cpi	r24, 0x55	; 85                # was not 0x41, 0x42, or 0x45. Check if 0x55.
     7e92:	79 f4       	brne	.+30     	;  0x7eb2
-    7e94:	88 d0       	rcall	.+272    	;  0x7fa6
-    7e96:	e8 2e       	mov	r14, r24
-    7e98:	ff 24       	eor	r15, r15
-    7e9a:	85 d0       	rcall	.+266    	;  0x7fa6
-    7e9c:	08 2f       	mov	r16, r24
-    7e9e:	10 e0       	ldi	r17, 0x00	; 0
-    7ea0:	10 2f       	mov	r17, r16
-    7ea2:	00 27       	eor	r16, r16
-    7ea4:	0e 29       	or	r16, r14
-    7ea6:	1f 29       	or	r17, r15
-    7ea8:	00 0f       	add	r16, r16
-    7eaa:	11 1f       	adc	r17, r17
-    7eac:	8e d0       	rcall	.+284    	;  0x7fca
-    7eae:	68 01       	movw	r12, r16
-    7eb0:	6f c0       	rjmp	.+222    	;  0x7f90
-    7eb2:	86 35       	cpi	r24, 0x56	; 86
-    7eb4:	21 f4       	brne	.+8      	;  0x7ebe
-    7eb6:	84 e0       	ldi	r24, 0x04	; 4
-    7eb8:	90 d0       	rcall	.+288    	;  0x7fda
-    7eba:	80 e0       	ldi	r24, 0x00	; 0
-    7ebc:	de cf       	rjmp	.-68     	;  0x7e7a
-    7ebe:	84 36       	cpi	r24, 0x64	; 100
-    7ec0:	09 f0       	breq	.+2      	;  0x7ec4
-    7ec2:	40 c0       	rjmp	.+128    	;  0x7f44
-    7ec4:	70 d0       	rcall	.+224    	;  0x7fa6
-    7ec6:	6f d0       	rcall	.+222    	;  0x7fa6
-    7ec8:	08 2f       	mov	r16, r24
-    7eca:	6d d0       	rcall	.+218    	;  0x7fa6
-    7ecc:	80 e0       	ldi	r24, 0x00	; 0
-    7ece:	c8 16       	cp	r12, r24
-    7ed0:	80 e7       	ldi	r24, 0x70	; 112
-    7ed2:	d8 06       	cpc	r13, r24
-    7ed4:	18 f4       	brcc	.+6      	;  0x7edc
-    7ed6:	f6 01       	movw	r30, r12
-    7ed8:	b7 be       	out	0x37, r11	; 55
+    7e94:	88 d0       	rcall	.+272    	;  0x7fa6       # was 0x55. r24 = Read_USART()
+    7e96:	e8 2e       	mov	r14, r24                        # r14 = r24
+    7e98:	ff 24       	eor	r15, r15                        # r15 = 0
+    7e9a:	85 d0       	rcall	.+266    	;  0x7fa6       # r24 = Read_USART()
+    7e9c:	08 2f       	mov	r16, r24                        # r16 = r24
+    7e9e:	10 e0       	ldi	r17, 0x00	; 0                 # r17 = 0x00
+    7ea0:	10 2f       	mov	r17, r16                        # r17 = r16
+    7ea2:	00 27       	eor	r16, r16                        # r16 = 0x00
+    7ea4:	0e 29       	or	r16, r14                        # r16 = r16 | r14
+    7ea6:	1f 29       	or	r17, r15                        # r17 = r17 | r15
+    7ea8:	00 0f       	add	r16, r16                        # r16 = r16 + r16
+    7eaa:	11 1f       	adc	r17, r17                        # r17 = r17 + r17 (with carry)
+    7eac:	8e d0       	rcall	.+284    	;  0x7fca       # read_another_0x20_and_write_0x14()
+    7eae:	68 01       	movw	r12, r16                    # r13r12 = r16r17
+    7eb0:	6f c0       	rjmp	.+222    	;  0x7f90       # [Write 0x10 and go back to reading 0x41]:
+    7eb2:	86 35       	cpi	r24, 0x56	; 86                # was not 0x55. Check if 0x56
+    7eb4:	21 f4       	brne	.+8      	;  0x7ebe       #
+    7eb6:	84 e0       	ldi	r24, 0x04	; 4                 # was 0x56. r24 = 0x04
+    7eb8:	90 d0       	rcall	.+288    	;  0x7fda       # Read_N_Characters(0x04)
+    7eba:	80 e0       	ldi	r24, 0x00	; 0                 # r24 = 0
+    7ebc:	de cf       	rjmp	.-68     	;  0x7e7a       # jump 0x7e7a with r24 == 0
+    7ebe:	84 36       	cpi	r24, 0x64	; 100               # was not 0x56. check if 0x64
+    7ec0:	09 f0       	breq	.+2      	;  0x7ec4       #
+    7ec2:	40 c0       	rjmp	.+128    	;  0x7f44       # was not 0x64. Jmp to 0x7f44
+    7ec4:	70 d0       	rcall	.+224    	;  0x7fa6       # was 0x64. call r24 = Read_USART()
+    7ec6:	6f d0       	rcall	.+222    	;  0x7fa6       # call r24 = Read_USART()
+    7ec8:	08 2f       	mov	r16, r24                        # r16 = r24
+    7eca:	6d d0       	rcall	.+218    	;  0x7fa6       # call r24 = Read_USART()
+    7ecc:	80 e0       	ldi	r24, 0x00	; 0                 # r24 = 0x00
+    7ece:	c8 16       	cp	r12, r24                        # compare r12 == r24
+    7ed0:	80 e7       	ldi	r24, 0x70	; 112               # r24 = 0x70
+    7ed2:	d8 06       	cpc	r13, r24                        # compare with carry r13 == r24
+    7ed4:	18 f4       	brcc	.+6      	;  0x7edc       # branch if carry cleared
+    7ed6:	f6 01       	movw	r30, r12                    # carry not cleared. r31r30 = r13r12
+    7ed8:	b7 be       	out	0x37, r11	; 55                # SPMCSR = r11 (may be 0x03, meaning Page Erase. r31 was 0x03)
     7eda:	e8 95       	spm
     7edc:	c0 e0       	ldi	r28, 0x00	; 0
     7ede:	d1 e0       	ldi	r29, 0x01	; 1
@@ -200,9 +200,10 @@ Disassembly of section .sec1:
     7f8a:	88 e0       	ldi	r24, 0x08	; 8
     7f8c:	18 d0       	rcall	.+48     	;  0x7fbe
     7f8e:	1d d0       	rcall	.+58     	;  0x7fca
+    [Write 0x10 and go back to reading 0x41]:
     7f90:	80 e1       	ldi	r24, 0x10	; 16
-    7f92:	01 d0       	rcall	.+2      	;  0x7f96
-    7f94:	65 cf       	rjmp	.-310    	;  0x7e60
+    7f92:	01 d0       	rcall	.+2      	;  0x7f96       # Write_USART(0x10)
+    7f94:	65 cf       	rjmp	.-310    	;  0x7e60       # go back to reading 0x41
     Write_USART(r24)
     7f96:	98 2f       	mov	r25, r24                        # r25 = r24
     7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A  
@@ -227,21 +228,22 @@ Disassembly of section .sec1:
     7fc4:	90 83       	st	Z, r25                          # [WDTCSR] = 0x18
     7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = r24
     7fc8:	08 95       	ret
-    x(r24)
+    read_another_0x20_and_write_0x14():
     7fca:	ed df       	rcall	.-38     	;  0x7fa6       # r24 = Read_USART()
     7fcc:	80 32       	cpi	r24, 0x20	; 32                # r24 ?= 0x20
     7fce:	19 f0       	breq	.+6      	;  0x7fd6
-    7fd0:	88 e0       	ldi	r24, 0x08	; 8                 # r24 = 0x08
+    7fd0:	88 e0       	ldi	r24, 0x08	; 8                 # didn't read 0x20, r24 = 0x08
     7fd2:	f5 df       	rcall	.-22     	;  0x7fbe       # Configure_Watchdog_Timer(0x08) // system reset from watchdog enable
     7fd4:	ff cf       	rjmp	.-2      	;  0x7fd4       # loop until Watchdog System Reset
-    7fd6:	84 e1       	ldi	r24, 0x14	; 20                # r24 = 0x14
-    7fd8:	de cf       	rjmp	.-68     	;  0x7f96       # Write_USART(0x14)
+    7fd6:	84 e1       	ldi	r24, 0x14	; 20                # read 0x020, r24 = 0x14
+    7fd8:	de cf       	rjmp	.-68     	;  0x7f96       # Write_USART(0x14) and return from call
+    Read_N_Characters(r24):
     7fda:	1f 93       	push	r17                         # push r17
     7fdc:	18 2f       	mov	r17, r24                        # r17 = r24
     7fde:	e3 df       	rcall	.-58     	;  0x7fa6       # r24 = Read_USART()
     7fe0:	11 50       	subi	r17, 0x01	; 1             # r17--;
     7fe2:	e9 f7       	brne	.-6      	;  0x7fde       # Loop until r17 == 0
-    7fe4:	f2 df       	rcall	.-28     	;  0x7fca       # x()
+    7fe4:	f2 df       	rcall	.-28     	;  0x7fca       # read_another_0x20_and_write_0x14()
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
     Go_To_Application_Start():
