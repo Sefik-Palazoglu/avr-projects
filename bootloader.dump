@@ -5,26 +5,26 @@
 Disassembly of section .sec1:
 
 00007e00 <.sec1+0x7e00>:
-    7e00:	11 24       	eor	r1, r1                          # r1 = 0
-    7e02:	84 b7       	in	r24, 0x34	; 52                # MCUSR_OLD = get_MCUSR()
-    7e04:	14 be       	out	0x34, r1	; 52                # set_MCUSR(0)
-    7e06:	81 ff       	sbrs	r24, 1                      # if (EXTRF is not set) call 0x7fea
-    7e08:	f0 d0       	rcall	.+480    	;  0x7fea       # else continue on Init_Bootloader
+    7e00:	11 24       	eor	r1, r1                          # r1 = 0x00
+    7e02:	84 b7       	in	r24, 0x34	; 52                # r24 = MCUSR
+    7e04:	14 be       	out	0x34, r1	; 52                # MCUSR = 0x00
+    7e06:	81 ff       	sbrs	r24, 1                      # if (external reset) continue Init_Bootloader()
+    7e08:	f0 d0       	rcall	.+480    	;  0x7fea       # else call Go_To_Application_Start()
     Init_Bootloader:
     Init_UART:
-    7e0a:	85 e0       	ldi	r24, 0x05	; 5                 # r24 = 5
-    7e0c:	80 93 81 00 	sts	0x0081, r24	;  0x800081         # TCCR1B =  CS12 | CS10  `clk_I/O / 1024 (from prescaler)`
+    7e0a:	85 e0       	ldi	r24, 0x05	; 5                 # r24 = 0x05
+    7e0c:	80 93 81 00 	sts	0x0081, r24	;  0x800081         # TCCR1B = (CS12 | CS10)  `clk_I/O / 1024 (from prescaler)`
     7e10:	82 e0       	ldi	r24, 0x02	; 2                 # r24 = 2
-    7e12:	80 93 c0 00 	sts	0x00C0, r24	;  0x8000c0         # UCSR0A = U2Xn `Double the USART Transmission Speed`
+    7e12:	80 93 c0 00 	sts	0x00C0, r24	;  0x8000c0         # UCSR0A = (U2Xn) `Double the USART Transmission Speed`
     7e16:	88 e1       	ldi	r24, 0x18	; 24                # r24 = 0x18
     7e18:	80 93 c1 00 	sts	0x00C1, r24	;  0x8000c1         # UCSR0B =  RXENn | TXENn `Receiver Enable and Transmitter Enable`
     7e1c:	86 e0       	ldi	r24, 0x06	; 6                 # r24 = 0x06
     7e1e:	80 93 c2 00 	sts	0x00C2, r24	;  0x8000c2         # UCSRnC = UCSZn1 | UCSZn0 `Character Size = 8 bits`
     7e22:	80 e1       	ldi	r24, 0x10	; 16                # r24 = 0x10
-    7e24:	80 93 c4 00 	sts	0x00C4, r24	;  0x8000c4         # UBRR0 = 0x010 `Up until now, makes baud rate 115200`
+    7e24:	80 93 c4 00 	sts	0x00C4, r24	;  0x8000c4         # UBRR0 = 0x10 `Up until now, makes baud rate 115200`
     7e28:	8e e0       	ldi	r24, 0x0E	; 14                # r24 = 0x0E
-    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe       # call Configure_Watchdog_Timer(0x0E) //  WDP2 | WDP1 Reset on Timeout, 128K cycles = 1.0s timeout time
-    7e2c:	25 9a       	sbi	0x04, 5	; 4                     # Set PORTB 5 to output
+    7e2a:	c9 d0       	rcall	.+402    	;  0x7fbe       # call Configure_Watchdog_Timer(WDE | WDP2 | WDP1) //  System Reset Mode 128K cycles ~ 1.0s timeout time
+    7e2c:	25 9a       	sbi	0x04, 5	; 4                     # Set PB5 to output (For the 'L' LED)
     7e2e:	86 e0       	ldi	r24, 0x06	; 6                 # r24 = 0x06
     7e30:	20 e3       	ldi	r18, 0x30	; 48                # r18 = 0x30
     7e32:	3c ef       	ldi	r19, 0xFC	; 252               # r19 = 0xFC
@@ -50,8 +50,8 @@ Disassembly of section .sec1:
     7e5e:	bf 2e       	mov	r11, r31                        # r11 = r31
     7e60:	a2 d0       	rcall	.+324    	;  0x7fa6       # r24 = Read_USART()
     7e62:	81 34       	cpi	r24, 0x41	; 65                # compare USART with 0x41
-    7e64:	61 f4       	brne	.+24     	;  0x7e7e       # Not 0x41, Go to 0x7e7e
-    7e66:	9f d0       	rcall	.+318    	;  0x7fa6       # 0x41, r24 = Read_USART()
+    7e64:	61 f4       	brne	.+24     	;  0x7e7e       # Was not 0x41, Go to 0x7e7e
+    7e66:	9f d0       	rcall	.+318    	;  0x7fa6       # Was 0x41, r24 = Read_USART()
     7e68:	08 2f       	mov	r16, r24                        # r16 = r24, last read USART
     7e6a:	af d0       	rcall	.+350    	;  0x7fca       # call read_another_0x20_and_write_0x14()
     7e6c:	02 38       	cpi	r16, 0x82	; 130               # check if previously read 0x82
@@ -66,7 +66,7 @@ Disassembly of section .sec1:
     7e7e:	82 34       	cpi	r24, 0x42	; 66                # is 0x42?
     7e80:	11 f4       	brne	.+4      	;  0x7e86
     7e82:	84 e1       	ldi	r24, 0x14	; 20                # was 0x42. r24 = 0x14
-    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c       # call Read_N_Characters(r24 = 0x14)
+    7e84:	03 c0       	rjmp	.+6      	;  0x7e8c       # go to Read_N_Characters(r24 = 0x14)
     7e86:	85 34       	cpi	r24, 0x45	; 69                # was not 0x42. check if r24 == 0x45
     7e88:	19 f4       	brne	.+6      	;  0x7e90
     7e8a:	85 e0       	ldi	r24, 0x05	; 5                 # was 0x45. call Read_N_Characters(r24 = 0x05)
@@ -87,7 +87,7 @@ Disassembly of section .sec1:
     7ea8:	00 0f       	add	r16, r16                        # r16 = r16 + r16
     7eaa:	11 1f       	adc	r17, r17                        # r17 = r17 + r17 (with carry)
     7eac:	8e d0       	rcall	.+284    	;  0x7fca       # read_another_0x20_and_write_0x14()
-    7eae:	68 01       	movw	r12, r16                    # r13r12 = r16r17
+    7eae:	68 01       	movw	r12, r16                    # r13r12 = r17r16
     7eb0:	6f c0       	rjmp	.+222    	;  0x7f90       # [Write 0x10 and go back to reading 0x41]:
     7eb2:	86 35       	cpi	r24, 0x56	; 86                # was not 0x55. Check if 0x56
     7eb4:	21 f4       	brne	.+8      	;  0x7ebe       #
@@ -108,47 +108,47 @@ Disassembly of section .sec1:
     7ed2:	d8 06       	cpc	r13, r24                        # compare with carry r13 == r24
     7ed4:	18 f4       	brcc	.+6      	;  0x7edc       # branch if carry cleared
     7ed6:	f6 01       	movw	r30, r12                    # carry not cleared. r31r30 = r13r12
-    7ed8:	b7 be       	out	0x37, r11	; 55                # SPMCSR = r11 (may be 0x03, meaning Page Erase. r31 was 0x03)
-    7eda:	e8 95       	spm
+    7ed8:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # page erase
+    7eda:	e8 95       	spm                                 # page erase 
     7edc:	c0 e0       	ldi	r28, 0x00	; 0
-    7ede:	d1 e0       	ldi	r29, 0x01	; 1
-    7ee0:	62 d0       	rcall	.+196    	;  0x7fa6
-    7ee2:	89 93       	st	Y+, r24
+    7ede:	d1 e0       	ldi	r29, 0x01	; 1                 # Y = 0x0100
+    7ee0:	62 d0       	rcall	.+196    	;  0x7fa6       # call r24 = Read_USART()
+    7ee2:	89 93       	st	Y+, r24                         # [Y++] = r24
     7ee4:	0c 17       	cp	r16, r28
-    7ee6:	e1 f7       	brne	.-8      	;  0x7ee0
-    7ee8:	f0 e0       	ldi	r31, 0x00	; 0
-    7eea:	cf 16       	cp	r12, r31
-    7eec:	f0 e7       	ldi	r31, 0x70	; 112
-    7eee:	df 06       	cpc	r13, r31
-    7ef0:	18 f0       	brcs	.+6      	;  0x7ef8
-    7ef2:	f6 01       	movw	r30, r12
-    7ef4:	b7 be       	out	0x37, r11	; 55
-    7ef6:	e8 95       	spm
-    7ef8:	68 d0       	rcall	.+208    	;  0x7fca
-    7efa:	07 b6       	in	r0, 0x37	; 55
-    7efc:	00 fc       	sbrc	r0, 0
-    7efe:	fd cf       	rjmp	.-6      	;  0x7efa
-    7f00:	a6 01       	movw	r20, r12
-    7f02:	a0 e0       	ldi	r26, 0x00	; 0
-    7f04:	b1 e0       	ldi	r27, 0x01	; 1
-    7f06:	2c 91       	ld	r18, X
-    7f08:	30 e0       	ldi	r19, 0x00	; 0
-    7f0a:	11 96       	adiw	r26, 0x01	; 1
-    7f0c:	8c 91       	ld	r24, X
-    7f0e:	11 97       	sbiw	r26, 0x01	; 1
-    7f10:	90 e0       	ldi	r25, 0x00	; 0
-    7f12:	98 2f       	mov	r25, r24
-    7f14:	88 27       	eor	r24, r24
-    7f16:	82 2b       	or	r24, r18
-    7f18:	93 2b       	or	r25, r19
-    7f1a:	12 96       	adiw	r26, 0x02	; 2
-    7f1c:	fa 01       	movw	r30, r20
-    7f1e:	0c 01       	movw	r0, r24
-    7f20:	87 be       	out	0x37, r8	; 55
-    7f22:	e8 95       	spm
-    7f24:	11 24       	eor	r1, r1
-    7f26:	4e 5f       	subi	r20, 0xFE	; 254
-    7f28:	5f 4f       	sbci	r21, 0xFF	; 255
+    7ee6:	e1 f7       	brne	.-8      	;  0x7ee0       # do while Y_low == r16
+    7ee8:	f0 e0       	ldi	r31, 0x00	; 0                 # Z_high = 0x00
+    7eea:	cf 16       	cp	r12, r31                        # r12 ?= 0x00
+    7eec:	f0 e7       	ldi	r31, 0x70	; 112               # Z_high = 0x70
+    7eee:	df 06       	cpc	r13, r31                        # r13 ?=
+    7ef0:	18 f0       	brcs	.+6      	;  0x7ef8       # branch if carry set
+    7ef2:	f6 01       	movw	r30, r12                    # Z = r13r12
+    7ef4:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # page erase
+    7ef6:	e8 95       	spm                                 # page erase
+    7ef8:	68 d0       	rcall	.+208    	;  0x7fca       # read_another_0x20_and_write_0x14()
+    7efa:	07 b6       	in	r0, 0x37	; 55                # r0 = SPMCSR
+    7efc:	00 fc       	sbrc	r0, 0                       # check SELFPRGEN
+    7efe:	fd cf       	rjmp	.-6      	;  0x7efa       # wait until page erase completes()
+    7f00:	a6 01       	movw	r20, r12                    # R21:R20 = R13:R12
+    7f02:	a0 e0       	ldi	r26, 0x00	; 0                 # 
+    7f04:	b1 e0       	ldi	r27, 0x01	; 1                 # X = 0x0100
+    7f06:	2c 91       	ld	r18, X                          # r18 = [X]
+    7f08:	30 e0       	ldi	r19, 0x00	; 0                 # r19 = 0x00
+    7f0a:	11 96       	adiw	r26, 0x01	; 1             # X += 1
+    7f0c:	8c 91       	ld	r24, X                          # r24 = [X]
+    7f0e:	11 97       	sbiw	r26, 0x01	; 1             # X -= 1
+    7f10:	90 e0       	ldi	r25, 0x00	; 0                 # r25 = 0
+    7f12:	98 2f       	mov	r25, r24                        # r25 = r24
+    7f14:	88 27       	eor	r24, r24                        # r24 = 0
+    7f16:	82 2b       	or	r24, r18                        # r24 = r18
+    7f18:	93 2b       	or	r25, r19                        # r25 = r19
+    7f1a:	12 96       	adiw	r26, 0x02	; 2             # X += 2
+    7f1c:	fa 01       	movw	r30, r20                    # Z = R21:R20
+    7f1e:	0c 01       	movw	r0, r24                     # R1:R0 = R25:R24
+    7f20:	87 be       	out	0x37, r8	; 55                # SPMCSR = (SELFPRGEN)
+    7f22:	e8 95       	spm                                 # store the value in R1:R0 in the temporary page buffer addressed by Z
+    7f24:	11 24       	eor	r1, r1                          # R1 = 0
+    7f26:	4e 5f       	subi	r20, 0xFE	; 254           
+    7f28:	5f 4f       	sbci	r21, 0xFF	; 255           # R21:R20 -= 0xFFFE
     7f2a:	f1 e0       	ldi	r31, 0x01	; 1
     7f2c:	a0 38       	cpi	r26, 0x80	; 128
     7f2e:	bf 07       	cpc	r27, r31
@@ -223,10 +223,10 @@ Disassembly of section .sec1:
     7fbc:	08 95       	ret
     Configure_Watchdog_Timer(r24):
     7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
-    7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = WDTCSR
+    7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = 0x0060 == WDTCSR
     7fc2:	98 e1       	ldi	r25, 0x18	; 24                # r25 = 0x18
-    7fc4:	90 83       	st	Z, r25                          # [WDTCSR] = 0x18
-    7fc6:	80 83       	st	Z, r24                          # [WDTCSR] = r24
+    7fc4:	90 83       	st	Z, r25                          # WDTCSR = (WDCE | WDE)
+    7fc6:	80 83       	st	Z, r24                          # WDTCSR = r24
     7fc8:	08 95       	ret
     read_another_0x20_and_write_0x14():
     7fca:	ed df       	rcall	.-38     	;  0x7fa6       # r24 = Read_USART()
@@ -247,8 +247,8 @@ Disassembly of section .sec1:
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
     Go_To_Application_Start():
-    7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0
-    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // disable
+    7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0x00
+    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // do nothing on WD time-out
     7fee:	ee 27       	eor	r30, r30
     7ff0:	ff 27       	eor	r31, r31
     7ff2:	09 94       	ijmp                               # jump to zero
