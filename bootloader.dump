@@ -102,66 +102,83 @@ Disassembly of section .sec1:
     7ec6:	6f d0       	rcall	.+222    	;  0x7fa6       # call r24 = Read_USART()
     7ec8:	08 2f       	mov	r16, r24                        # r16 = r24
     7eca:	6d d0       	rcall	.+218    	;  0x7fa6       # call r24 = Read_USART()
-    7ecc:	80 e0       	ldi	r24, 0x00	; 0                 # r24 = 0x00
-    7ece:	c8 16       	cp	r12, r24                        # compare r12 == r24
-    7ed0:	80 e7       	ldi	r24, 0x70	; 112               # r24 = 0x70
-    7ed2:	d8 06       	cpc	r13, r24                        # compare with carry r13 == r24
-    7ed4:	18 f4       	brcc	.+6      	;  0x7edc       # branch if carry cleared
-    7ed6:	f6 01       	movw	r30, r12                    # carry not cleared. r31r30 = r13r12
-    7ed8:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # page erase
-    7eda:	e8 95       	spm                                 # page erase 
-    7edc:	c0 e0       	ldi	r28, 0x00	; 0
+    
+page erase if (R13:R12 < 0x7000)
+    7ecc:	80 e0       	ldi	r24, 0x00	; 0                 #
+    7ece:	c8 16       	cp	r12, r24                        #
+    7ed0:	80 e7       	ldi	r24, 0x70	; 112               #
+    7ed2:	d8 06       	cpc	r13, r24                        #
+    7ed4:	18 f4       	brcc	.+6      	;  0x7edc       # skip page erase if (R13:R12 >= 0x7000)
+    7ed6:	f6 01       	movw	r30, r12                    # (R13:R12 < 0x7000). Z = R13:R12
+    7ed8:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # set up page erase
+    7eda:	e8 95       	spm                                 # page erase R13'th page.
+    
+Read 'R16' characters and save them to [0x0100]:[0x01:R16]
+    7edc:	c0 e0       	ldi	r28, 0x00	; 0                 #
     7ede:	d1 e0       	ldi	r29, 0x01	; 1                 # Y = 0x0100
     7ee0:	62 d0       	rcall	.+196    	;  0x7fa6       # call r24 = Read_USART()
     7ee2:	89 93       	st	Y+, r24                         # [Y++] = r24
     7ee4:	0c 17       	cp	r16, r28
     7ee6:	e1 f7       	brne	.-8      	;  0x7ee0       # do while Y_low == r16
-    7ee8:	f0 e0       	ldi	r31, 0x00	; 0                 # Z_high = 0x00
-    7eea:	cf 16       	cp	r12, r31                        # r12 ?= 0x00
-    7eec:	f0 e7       	ldi	r31, 0x70	; 112               # Z_high = 0x70
-    7eee:	df 06       	cpc	r13, r31                        # r13 ?=
-    7ef0:	18 f0       	brcs	.+6      	;  0x7ef8       # branch if carry set
-    7ef2:	f6 01       	movw	r30, r12                    # Z = r13r12
-    7ef4:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # page erase
-    7ef6:	e8 95       	spm                                 # page erase
+
+page erase if (R13:R12 >= 0x7000)
+    7ee8:	f0 e0       	ldi	r31, 0x00	; 0                 #
+    7eea:	cf 16       	cp	r12, r31                        #
+    7eec:	f0 e7       	ldi	r31, 0x70	; 112               #
+    7eee:	df 06       	cpc	r13, r31                        #
+    7ef0:	18 f0       	brcs	.+6      	;  0x7ef8       # skip page erase if (R13:R12 < 0x7000)
+    7ef2:	f6 01       	movw	r30, r12                    # (R13:R12 >= 0x7000). Z = r13r12
+    7ef4:	b7 be       	out	0x37, r11	; 55                # SPMCSR = (PGERS | SELFPRGEN) # set up page erase
+    7ef6:	e8 95       	spm                                 # page erase R13'th page.
+    
     7ef8:	68 d0       	rcall	.+208    	;  0x7fca       # read_another_0x20_and_write_0x14()
+
+wait until page erase completes
     7efa:	07 b6       	in	r0, 0x37	; 55                # r0 = SPMCSR
     7efc:	00 fc       	sbrc	r0, 0                       # check SELFPRGEN
     7efe:	fd cf       	rjmp	.-6      	;  0x7efa       # wait until page erase completes()
+    
+PAGE_BUFFER[R13:R12-R13:R12+0x80] = SRAM[0x0100-0x0180]
     7f00:	a6 01       	movw	r20, r12                    # R21:R20 = R13:R12
     7f02:	a0 e0       	ldi	r26, 0x00	; 0                 # 
     7f04:	b1 e0       	ldi	r27, 0x01	; 1                 # X = 0x0100
-    7f06:	2c 91       	ld	r18, X                          # r18 = [X]
+    7f06:	2c 91       	ld	r18, X                          # r18 = [X] == [Starting from 0x0100]
     7f08:	30 e0       	ldi	r19, 0x00	; 0                 # r19 = 0x00
     7f0a:	11 96       	adiw	r26, 0x01	; 1             # X += 1
-    7f0c:	8c 91       	ld	r24, X                          # r24 = [X]
+    7f0c:	8c 91       	ld	r24, X                          # r24 = [X] == [X + 1]
     7f0e:	11 97       	sbiw	r26, 0x01	; 1             # X -= 1
     7f10:	90 e0       	ldi	r25, 0x00	; 0                 # r25 = 0
-    7f12:	98 2f       	mov	r25, r24                        # r25 = r24
+    7f12:	98 2f       	mov	r25, r24                        # r25 = r24 == [X + 1]
     7f14:	88 27       	eor	r24, r24                        # r24 = 0
-    7f16:	82 2b       	or	r24, r18                        # r24 = r18
-    7f18:	93 2b       	or	r25, r19                        # r25 = r19
+    7f16:	82 2b       	or	r24, r18                        # r24 = r18 == [X]
+    7f18:	93 2b       	or	r25, r19                        # r25 = r19 == [X + 1]
     7f1a:	12 96       	adiw	r26, 0x02	; 2             # X += 2
-    7f1c:	fa 01       	movw	r30, r20                    # Z = R21:R20
-    7f1e:	0c 01       	movw	r0, r24                     # R1:R0 = R25:R24
+    7f1c:	fa 01       	movw	r30, r20                    # Z = R21:R20 # gets incremented by 2 every iteration
+    7f1e:	0c 01       	movw	r0, r24                     # R1:R0 = R25:R24 == [X + 1]:[X]
     7f20:	87 be       	out	0x37, r8	; 55                # SPMCSR = (SELFPRGEN)
-    7f22:	e8 95       	spm                                 # store the value in R1:R0 in the temporary page buffer addressed by Z
+    7f22:	e8 95       	spm                                 # store the value in [X + 1]:[X] in the temporary page buffer addressed by Z
     7f24:	11 24       	eor	r1, r1                          # R1 = 0
     7f26:	4e 5f       	subi	r20, 0xFE	; 254           
-    7f28:	5f 4f       	sbci	r21, 0xFF	; 255           # R21:R20 -= 0xFFFE
-    7f2a:	f1 e0       	ldi	r31, 0x01	; 1
-    7f2c:	a0 38       	cpi	r26, 0x80	; 128
-    7f2e:	bf 07       	cpc	r27, r31
-    7f30:	51 f7       	brne	.-44     	;  0x7f06
-    7f32:	f6 01       	movw	r30, r12
-    7f34:	a7 be       	out	0x37, r10	; 55
-    7f36:	e8 95       	spm
+    7f28:	5f 4f       	sbci	r21, 0xFF	; 255           # R21:R20 -= 0xFFFE or R21:R20 += 0x2
+    7f2a:	f1 e0       	ldi	r31, 0x01	; 1                 #
+    7f2c:	a0 38       	cpi	r26, 0x80	; 128               #
+    7f2e:	bf 07       	cpc	r27, r31                        #
+    7f30:	51 f7       	brne	.-44     	;  0x7f06       # do while (X != 0x0180)
+
+
+page write:
+    7f32:	f6 01       	movw	r30, r12                    # Z = R13:R12
+    7f34:	a7 be       	out	0x37, r10	; 55                # SPMSCR = (PGWRT | SELFPRGEN)
+    7f36:	e8 95       	spm                                 # page write
+wait until page write completes:
     7f38:	07 b6       	in	r0, 0x37	; 55
     7f3a:	00 fc       	sbrc	r0, 0
     7f3c:	fd cf       	rjmp	.-6      	;  0x7f38
-    7f3e:	97 be       	out	0x37, r9	; 55
-    7f40:	e8 95       	spm
-    7f42:	26 c0       	rjmp	.+76     	;  0x7f90
+
+    7f3e:	97 be       	out	0x37, r9	; 55                # SPMSCR = (RWWSRE | SELFPRGEN)
+    7f40:	e8 95       	spm                                 # Re-enable Read While Write Section
+    7f42:	26 c0       	rjmp	.+76     	;  0x7f90       # [Write 0x10 and go back to reading 0x41]:
+    
     7f44:	84 37       	cpi	r24, 0x74	; 116
     7f46:	b1 f4       	brne	.+44     	;  0x7f74
     7f48:	2e d0       	rcall	.+92     	;  0x7fa6
@@ -200,18 +217,21 @@ Disassembly of section .sec1:
     7f8a:	88 e0       	ldi	r24, 0x08	; 8
     7f8c:	18 d0       	rcall	.+48     	;  0x7fbe
     7f8e:	1d d0       	rcall	.+58     	;  0x7fca
-    [Write 0x10 and go back to reading 0x41]:
+
+[Write 0x10 and go back to reading 0x41]:
     7f90:	80 e1       	ldi	r24, 0x10	; 16
     7f92:	01 d0       	rcall	.+2      	;  0x7f96       # Write_USART(0x10)
     7f94:	65 cf       	rjmp	.-310    	;  0x7e60       # go back to reading 0x41
-    Write_USART(r24)
+
+Write_USART(r24)
     7f96:	98 2f       	mov	r25, r24                        # r25 = r24
     7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A  
     7f9c:	85 ff       	sbrs	r24, 5                      # skip if USART Data Register Empty
     7f9e:	fc cf       	rjmp	.-8      	;  0x7f98       # loop until USART Data Register Empty
     7fa0:	90 93 c6 00 	sts	0x00C6, r25	;  0x8000c6         # Write to USART IO Data Register
     7fa4:	08 95       	ret
-    r24 = Read_USART():
+
+r24 = Read_USART():
     7fa6:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A 
     7faa:	87 ff       	sbrs	r24, 7                      # skip if USART Receive Complete
     7fac:	fc cf       	rjmp	.-8      	;  0x7fa6       # loop until receive complete
@@ -221,14 +241,16 @@ Disassembly of section .sec1:
     7fb6:	a8 95       	wdr                                 # no Frame Error, watchdog reset
     7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6         # read r24 = USART I/O Data Register
     7fbc:	08 95       	ret
-    Configure_Watchdog_Timer(r24):
+
+Configure_Watchdog_Timer(r24):
     7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
     7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = 0x0060 == WDTCSR
     7fc2:	98 e1       	ldi	r25, 0x18	; 24                # r25 = 0x18
     7fc4:	90 83       	st	Z, r25                          # WDTCSR = (WDCE | WDE)
     7fc6:	80 83       	st	Z, r24                          # WDTCSR = r24
     7fc8:	08 95       	ret
-    read_another_0x20_and_write_0x14():
+
+read_another_0x20_and_write_0x14():
     7fca:	ed df       	rcall	.-38     	;  0x7fa6       # r24 = Read_USART()
     7fcc:	80 32       	cpi	r24, 0x20	; 32                # r24 ?= 0x20
     7fce:	19 f0       	breq	.+6      	;  0x7fd6
@@ -237,7 +259,8 @@ Disassembly of section .sec1:
     7fd4:	ff cf       	rjmp	.-2      	;  0x7fd4       # loop until Watchdog System Reset
     7fd6:	84 e1       	ldi	r24, 0x14	; 20                # read 0x020, r24 = 0x14
     7fd8:	de cf       	rjmp	.-68     	;  0x7f96       # Write_USART(0x14) and return from call
-    Read_N_Characters(r24):
+
+Read_N_Characters(r24):
     7fda:	1f 93       	push	r17                         # push r17
     7fdc:	18 2f       	mov	r17, r24                        # r17 = r24
     7fde:	e3 df       	rcall	.-58     	;  0x7fa6       # r24 = Read_USART()
@@ -246,7 +269,8 @@ Disassembly of section .sec1:
     7fe4:	f2 df       	rcall	.-28     	;  0x7fca       # read_another_0x20_and_write_0x14()
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
-    Go_To_Application_Start():
+
+Go_To_Application_Start():
     7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0x00
     7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // do nothing on WD time-out
     7fee:	ee 27       	eor	r30, r30
