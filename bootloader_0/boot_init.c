@@ -6,6 +6,7 @@ void BOOTLOADER_SECTION __attribute((noreturn)) Go_To_Application_Start(void);
 void BOOTLOADER_SECTION Init_UART(void);
 void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags);
 uint8_t BOOTLOADER_SECTION Read_USART();
+void BOOTLOADER_SECTION Write_USART(uint8_t data);
 
 void BOOTLOADER_SECTION __attribute__ ((used)) _Noreturn my_bootloader(void)
 {

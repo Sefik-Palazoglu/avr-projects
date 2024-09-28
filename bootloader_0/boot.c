@@ -4,6 +4,7 @@
 
 void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags);
 uint8_t BOOTLOADER_SECTION Read_USART();
+void BOOTLOADER_SECTION Write_USART(uint8_t data);
 
 void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags)
 {
@@ -41,3 +42,11 @@ uint8_t BOOTLOADER_SECTION Read_USART()
 
 	return UDR0;
 }
+
+void BOOTLOADER_SECTION Write_USART(uint8_t data)
+{
+	while (!(UCSR0A & (1 < UDRE0))) ;
+
+	UDR0 = data;
+}
+
