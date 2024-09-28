@@ -82,7 +82,7 @@ Handle 0x42/0x45 ==> Read 0x14/0x05 characters
     7e8c:	a6 d0       	rcall	.+332    	;  0x7fda       # call Read_N_Characters(R24)
     7e8e:	80 c0       	rjmp	.+256    	;  0x7f90       # jmp to [Write 0x10 and go back to reading 0x41]
 
-Handle 0x55
+Handle 0x55 Set Cursor (Cursor saved in R13:R12)
 R16 = Read_USART_0()
 R17 = Read_USART_1()
 R13:R12 = 2 * (R17:R16)
@@ -190,44 +190,49 @@ Re-enable Read While Write Section
     7f40:	e8 95       	spm                                 # Re-enable Read While Write Section
     7f42:	26 c0       	rjmp	.+76     	;  0x7f90       # [Write 0x10 and go back to reading 0x41]:
 
+Handle 0x74: Read program memory N bytes starting from R13:R12
     7f44:	84 37       	cpi	r24, 0x74	; 116
     7f46:	b1 f4       	brne	.+44     	;  0x7f74
-    7f48:	2e d0       	rcall	.+92     	;  0x7fa6
-    7f4a:	2d d0       	rcall	.+90     	;  0x7fa6
-    7f4c:	f8 2e       	mov	r15, r24
-    7f4e:	2b d0       	rcall	.+86     	;  0x7fa6
-    7f50:	3c d0       	rcall	.+120    	;  0x7fca
-    7f52:	f6 01       	movw	r30, r12
-    7f54:	ef 2c       	mov	r14, r15
-    7f56:	8f 01       	movw	r16, r30
-    7f58:	0f 5f       	subi	r16, 0xFF	; 255
-    7f5a:	1f 4f       	sbci	r17, 0xFF	; 255
-    7f5c:	84 91       	lpm	r24, Z
-    7f5e:	1b d0       	rcall	.+54     	;  0x7f96
-    7f60:	ea 94       	dec	r14
-    7f62:	f8 01       	movw	r30, r16
-    7f64:	c1 f7       	brne	.-16     	;  0x7f56
-    7f66:	08 94       	sec
-    7f68:	c1 1c       	adc	r12, r1
-    7f6a:	d1 1c       	adc	r13, r1
-    7f6c:	fa 94       	dec	r15
-    7f6e:	cf 0c       	add	r12, r15
-    7f70:	d1 1c       	adc	r13, r1
-    7f72:	0e c0       	rjmp	.+28     	;  0x7f90
+    7f48:	2e d0       	rcall	.+92     	;  0x7fa6       # call R24 = Read_USART()   Discard Read_0
+    7f4a:	2d d0       	rcall	.+90     	;  0x7fa6       # call R24 = Read_USART()   Read_1
+    7f4c:	f8 2e       	mov	r15, r24                        # R15 = Read_1
+    7f4e:	2b d0       	rcall	.+86     	;  0x7fa6       # call R24 = Read_USART()   Read_2
+    7f50:	3c d0       	rcall	.+120    	;  0x7fca       # read_another_0x20_and_write_0x14()
+    7f52:	f6 01       	movw	r30, r12                    # Z = R13:R12
+    7f54:	ef 2c       	mov	r14, r15                        # R14 = R15
+    7f56:	8f 01       	movw	r16, r30                    # R17:R16 = Z
+    7f58:	0f 5f       	subi	r16, 0xFF	; 255           #
+    7f5a:	1f 4f       	sbci	r17, 0xFF	; 255           # R17:R16 += 1
+    7f5c:	84 91       	lpm	r24, Z                          # R24 = PROGRAM_MEMORY[Z]
+    7f5e:	1b d0       	rcall	.+54     	;  0x7f96       # Write_USART(PROGRAM_MEMORY[Z])
+    7f60:	ea 94       	dec	r14                             # R14--
+    7f62:	f8 01       	movw	r30, r16                    # Z = Z + 1
+    7f64:	c1 f7       	brne	.-16     	;  0x7f56       # Do 0x7f56 while R14 == 0
+    7f66:	08 94       	sec                                 #
+    7f68:	c1 1c       	adc	r12, r1                         # 
+    7f6a:	d1 1c       	adc	r13, r1                         # R13:R12 += 1
+    7f6c:	fa 94       	dec	r15                             # R15--
+    7f6e:	cf 0c       	add	r12, r15                        # 
+    7f70:	d1 1c       	adc	r13, r1                         # R13:R12 += R15
+    7f72:	0e c0       	rjmp	.+28     	;  0x7f90       # [Write 0x10 and go back to reading 0x41]:
+
+Handle 0x75
     7f74:	85 37       	cpi	r24, 0x75	; 117
     7f76:	39 f4       	brne	.+14     	;  0x7f86
-    7f78:	28 d0       	rcall	.+80     	;  0x7fca
-    7f7a:	8e e1       	ldi	r24, 0x1E	; 30
-    7f7c:	0c d0       	rcall	.+24     	;  0x7f96
-    7f7e:	85 e9       	ldi	r24, 0x95	; 149
-    7f80:	0a d0       	rcall	.+20     	;  0x7f96
-    7f82:	8f e0       	ldi	r24, 0x0F	; 15
-    7f84:	7a cf       	rjmp	.-268    	;  0x7e7a
+    7f78:	28 d0       	rcall	.+80     	;  0x7fca       # read_another_0x20_and_write_0x14()
+    7f7a:	8e e1       	ldi	r24, 0x1E	; 30                # R24 = 0x1E
+    7f7c:	0c d0       	rcall	.+24     	;  0x7f96       # Write_USART(0x1E)
+    7f7e:	85 e9       	ldi	r24, 0x95	; 149               # R24 = 0x95
+    7f80:	0a d0       	rcall	.+20     	;  0x7f96       # Write_USART(0x95)
+    7f82:	8f e0       	ldi	r24, 0x0F	; 15                # R24 = 0x0F
+    7f84:	7a cf       	rjmp	.-268    	;  0x7e7a       # Write_USART(0x0F) and Listen
+    
+Handle 0x51 enable system reset from watchdog timeout
     7f86:	81 35       	cpi	r24, 0x51	; 81
     7f88:	11 f4       	brne	.+4      	;  0x7f8e
-    7f8a:	88 e0       	ldi	r24, 0x08	; 8
-    7f8c:	18 d0       	rcall	.+48     	;  0x7fbe
-    7f8e:	1d d0       	rcall	.+58     	;  0x7fca
+    7f8a:	88 e0       	ldi	r24, 0x08	; 8                 # R24 = 0x08
+    7f8c:	18 d0       	rcall	.+48     	;  0x7fbe       # Configure_Watchdog_Timer(0x08) // system reset on watchdog timeout
+    7f8e:	1d d0       	rcall	.+58     	;  0x7fca       # read_another_0x20_and_write_0x14()    
 
 [Write 0x10 and go back to reading 0x41]:
     7f90:	80 e1       	ldi	r24, 0x10	; 16
@@ -235,55 +240,55 @@ Re-enable Read While Write Section
     7f94:	65 cf       	rjmp	.-310    	;  0x7e60       # go back to reading 0x41
 
 Write_USART(r24)
-    7f96:	98 2f       	mov	r25, r24                        # r25 = r24
-    7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A  
+    7f96:	98 2f       	mov	r25, r24                        # R25 = R24
+    7f98:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load R24 = UCSR0A  
     7f9c:	85 ff       	sbrs	r24, 5                      # skip if USART Data Register Empty
     7f9e:	fc cf       	rjmp	.-8      	;  0x7f98       # loop until USART Data Register Empty
     7fa0:	90 93 c6 00 	sts	0x00C6, r25	;  0x8000c6         # Write to USART IO Data Register
     7fa4:	08 95       	ret
 
 r24 = Read_USART():
-    7fa6:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A 
+    7fa6:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load R24 = UCSR0A 
     7faa:	87 ff       	sbrs	r24, 7                      # skip if USART Receive Complete
     7fac:	fc cf       	rjmp	.-8      	;  0x7fa6       # loop until receive complete
-    7fae:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load r24 = UCSR0A 
+    7fae:	80 91 c0 00 	lds	r24, 0x00C0	;  0x8000c0         # load R24 = UCSR0A 
     7fb2:	84 fd       	sbrc	r24, 4                      # skip if Frame Error Cleared
     7fb4:	01 c0       	rjmp	.+2      	;  0x7fb8       # Frame Error, skip watchdog reset
     7fb6:	a8 95       	wdr                                 # no Frame Error, watchdog reset
-    7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6         # read r24 = USART I/O Data Register
+    7fb8:	80 91 c6 00 	lds	r24, 0x00C6	;  0x8000c6         # read R24 = USART I/O Data Register
     7fbc:	08 95       	ret
 
 Configure_Watchdog_Timer(r24):
     7fbe:	e0 e6       	ldi	r30, 0x60	; 96                # Z_low = 0x60
     7fc0:	f0 e0       	ldi	r31, 0x00	; 0                 # Z = 0x0060 == WDTCSR
-    7fc2:	98 e1       	ldi	r25, 0x18	; 24                # r25 = 0x18
+    7fc2:	98 e1       	ldi	r25, 0x18	; 24                # R25 = 0x18
     7fc4:	90 83       	st	Z, r25                          # WDTCSR = (WDCE | WDE)
-    7fc6:	80 83       	st	Z, r24                          # WDTCSR = r24
+    7fc6:	80 83       	st	Z, r24                          # WDTCSR = R24
     7fc8:	08 95       	ret
 
 read_another_0x20_and_write_0x14():
-    7fca:	ed df       	rcall	.-38     	;  0x7fa6       # r24 = Read_USART()
-    7fcc:	80 32       	cpi	r24, 0x20	; 32                # r24 ?= 0x20
+    7fca:	ed df       	rcall	.-38     	;  0x7fa6       # R24 = Read_USART()
+    7fcc:	80 32       	cpi	r24, 0x20	; 32                # R24 ?= 0x20
     7fce:	19 f0       	breq	.+6      	;  0x7fd6
-    7fd0:	88 e0       	ldi	r24, 0x08	; 8                 # didn't read 0x20, r24 = 0x08
-    7fd2:	f5 df       	rcall	.-22     	;  0x7fbe       # Configure_Watchdog_Timer(0x08) // system reset from watchdog enable
+    7fd0:	88 e0       	ldi	r24, 0x08	; 8                 # didn't read 0x20, R24 = 0x08
+    7fd2:	f5 df       	rcall	.-22     	;  0x7fbe       # Configure_Watchdog_Timer(0x08) // system reset on watchdog timeout
     7fd4:	ff cf       	rjmp	.-2      	;  0x7fd4       # loop until Watchdog System Reset
-    7fd6:	84 e1       	ldi	r24, 0x14	; 20                # read 0x020, r24 = 0x14
+    7fd6:	84 e1       	ldi	r24, 0x14	; 20                # read 0x020, R24 = 0x14
     7fd8:	de cf       	rjmp	.-68     	;  0x7f96       # Write_USART(0x14) and return from call
 
 Read_N_Characters(r24):
-    7fda:	1f 93       	push	r17                         # push r17
-    7fdc:	18 2f       	mov	r17, r24                        # r17 = r24
-    7fde:	e3 df       	rcall	.-58     	;  0x7fa6       # r24 = Read_USART()
-    7fe0:	11 50       	subi	r17, 0x01	; 1             # r17--;
-    7fe2:	e9 f7       	brne	.-6      	;  0x7fde       # Loop until r17 == 0
+    7fda:	1f 93       	push	r17                         # push R17
+    7fdc:	18 2f       	mov	r17, r24                        # R17 = R24
+    7fde:	e3 df       	rcall	.-58     	;  0x7fa6       # R24 = Read_USART()
+    7fe0:	11 50       	subi	r17, 0x01	; 1             # R17--;
+    7fe2:	e9 f7       	brne	.-6      	;  0x7fde       # Loop until R17 == 0
     7fe4:	f2 df       	rcall	.-28     	;  0x7fca       # read_another_0x20_and_write_0x14()
     7fe6:	1f 91       	pop	r17
     7fe8:	08 95       	ret
 
 Go_To_Application_Start():
-    7fea:	80 e0       	ldi	r24, 0x00	; 0                # r24 = 0x00
-    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // do nothing on WD time-out
+    7fea:	80 e0       	ldi	r24, 0x00	; 0                # R24 = 0x00
+    7fec:	e8 df       	rcall	.-48     	;  0x7fbe      # Configure_Watchdog_Timer(0x0) // ignore watchdog timeout
     7fee:	ee 27       	eor	r30, r30
     7ff0:	ff 27       	eor	r31, r31
     7ff2:	09 94       	ijmp                               # jump to zero
