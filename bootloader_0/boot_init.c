@@ -8,6 +8,7 @@ void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags);
 uint8_t BOOTLOADER_SECTION Read_USART();
 void BOOTLOADER_SECTION Write_USART(uint8_t data);
 void BOOTLOADER_SECTION read_another_0x20_and_write_0x14();
+void BOOTLOADER_SECTION Read_N_Characters(uint8_t count);
 
 void BOOTLOADER_SECTION __attribute__ ((used)) _Noreturn my_bootloader(void)
 {
@@ -31,11 +32,18 @@ void BOOTLOADER_SECTION __attribute__ ((used)) _Noreturn my_bootloader(void)
 					Write_USART(0x04);
 				else
 					Write_USART(0x03);
+				Write_USART(0x10);
 			}
 			else if (usart_read_0 == 0x42)
 			{
+				Read_N_Characters(0x14);
+				Write_USART(0x10);
 			}
-			Write_USART(0x10);
+			else if (usart_read_0 == 0x45)
+			{
+				Read_N_Characters(0x05);
+				Write_USART(0x10);
+			}
 		}
 	}
 	else

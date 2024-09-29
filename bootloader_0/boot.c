@@ -64,3 +64,11 @@ void BOOTLOADER_SECTION read_another_0x20_and_write_0x14()
 	}
 }
 
+void BOOTLOADER_SECTION Read_N_Characters(uint8_t count)
+{
+	for (uint8_t i = 0; i < count; i++)
+	{
+		Read_USART();
+	}
+	read_another_0x20_and_write_0x14();
+}
