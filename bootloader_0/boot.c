@@ -50,3 +50,17 @@ void BOOTLOADER_SECTION Write_USART(uint8_t data)
 	UDR0 = data;
 }
 
+void BOOTLOADER_SECTION read_another_0x20_and_write_0x14()
+{
+	uint8_t data = Read_USART();
+	if (data == 0x20)
+	{
+		Write_USART(0x14);
+	}
+	else
+	{
+		Configure_Watchdog_Timer((1 << WDE));
+		while (1) ;
+	}
+}
+
