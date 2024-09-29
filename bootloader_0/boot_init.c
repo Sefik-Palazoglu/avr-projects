@@ -14,6 +14,7 @@ void BOOTLOADER_SECTION __attribute__ ((used)) _Noreturn my_bootloader(void)
 {
 	asm volatile ("eor r1, r1");
 	uint8_t mcusr = MCUSR;
+	uint16_t cursor;
 	MCUSR = 0x00;
 
 	if (mcusr & (1 << EXTRF))
@@ -32,18 +33,34 @@ void BOOTLOADER_SECTION __attribute__ ((used)) _Noreturn my_bootloader(void)
 					Write_USART(0x04);
 				else
 					Write_USART(0x03);
-				Write_USART(0x10);
 			}
 			else if (usart_read_0 == 0x42)
 			{
 				Read_N_Characters(0x14);
-				Write_USART(0x10);
 			}
 			else if (usart_read_0 == 0x45)
 			{
 				Read_N_Characters(0x05);
-				Write_USART(0x10);
 			}
+			else if (usart_read_0 == 0x55)
+			{
+				cursor = 0;
+				cursor = Read_USART();
+				cursor |= (Read_USART() << 8);
+				cursor *= 2;
+				read_another_0x20_and_write_0x14();
+			}
+			else if (usart_read_0 == 0x56)
+			{
+				Read_N_Characters(0x04);
+				Write_USART(0x00);
+			}
+			else if (cursor == 0)
+			{
+				Write_USART(0xDD);
+			}
+
+			Write_USART(0x10);
 		}
 	}
 	else

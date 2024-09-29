@@ -2,7 +2,7 @@ DEVICE     = atmega328p
 CLOCK      = 16000000L
 OBJECTS    = main.o boot.o boot_init.o
 
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -flto
+COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 all:	main.hex
 
