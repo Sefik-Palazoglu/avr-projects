@@ -2,17 +2,17 @@
 #include <avr/boot.h>
 #include <avr/wdt.h>
 
-void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags);
-uint8_t BOOTLOADER_SECTION Read_USART();
-void BOOTLOADER_SECTION Write_USART(uint8_t data);
+void Configure_Watchdog_Timer(uint8_t flags);
+uint8_t Read_USART();
+void Write_USART(uint8_t data);
 
-void BOOTLOADER_SECTION Configure_Watchdog_Timer(uint8_t flags)
+void Configure_Watchdog_Timer(uint8_t flags)
 {
 	WDTCSR = ((0x01 << WDCE) | (0x01 << WDE));
 	WDTCSR = flags;
 }
 
-void BOOTLOADER_SECTION __attribute((noreturn)) Go_To_Application_Start(void)
+void __attribute((noreturn)) Go_To_Application_Start(void)
 {
 	Configure_Watchdog_Timer(0x00); // ignore watchdog timeout
 	// RunApp();
@@ -23,7 +23,7 @@ void BOOTLOADER_SECTION __attribute((noreturn)) Go_To_Application_Start(void)
 	);
 }
 
-void BOOTLOADER_SECTION Init_UART(void)
+void Init_UART(void)
 {
 	UCSR0A = (1 << U2X0);
 	UCSR0B = ((1 << RXEN0) | (1 << TXEN0));
@@ -31,7 +31,7 @@ void BOOTLOADER_SECTION Init_UART(void)
 	UBRR0L = 0x10;
 }
 
-uint8_t BOOTLOADER_SECTION Read_USART()
+uint8_t Read_USART()
 {
 	while (UCSR0A & (1 << RXC0)) ;
 
@@ -43,14 +43,14 @@ uint8_t BOOTLOADER_SECTION Read_USART()
 	return UDR0;
 }
 
-void BOOTLOADER_SECTION Write_USART(uint8_t data)
+void Write_USART(uint8_t data)
 {
 	while (!(UCSR0A & (1 < UDRE0))) ;
 
 	UDR0 = data;
 }
 
-void BOOTLOADER_SECTION read_another_0x20_and_write_0x14()
+void read_another_0x20_and_write_0x14()
 {
 	uint8_t data = Read_USART();
 	if (data == 0x20)
@@ -64,7 +64,7 @@ void BOOTLOADER_SECTION read_another_0x20_and_write_0x14()
 	}
 }
 
-void BOOTLOADER_SECTION Read_N_Characters(uint8_t count)
+void Read_N_Characters(uint8_t count)
 {
 	while (count)
 	{
@@ -73,3 +73,4 @@ void BOOTLOADER_SECTION Read_N_Characters(uint8_t count)
 	}
 	read_another_0x20_and_write_0x14();
 }
+

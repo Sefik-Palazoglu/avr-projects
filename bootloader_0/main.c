@@ -1,14 +1,154 @@
 #include <avr/io.h>
+#include <avr/boot.h>
+#include <avr/wdt.h>
 
-int main(void)
+void Configure_Watchdog_Timer(uint8_t flags)
 {
-	DDRB |= 1 << DDB5;
-
-	while (1) 
-	{
-		PORTB |= 1 << PB5;
-	}
-
-    return 0;
+	WDTCSR = ((0x01 << WDCE) | (0x01 << WDE));
+	WDTCSR = flags;
 }
 
+void _Noreturn Go_To_Application_Start(void)
+{
+	Configure_Watchdog_Timer(0x00); // ignore watchdog timeout
+	// RunApp();
+	asm volatile (
+		"eor r30, r30\n"
+		"eor r31, r31\n"
+		"ijmp\n"
+	);
+}
+
+void Init_UART(void)
+{
+	UCSR0A = (1 << U2X0);
+	UCSR0B = ((1 << RXEN0) | (1 << TXEN0));
+	UCSR0C = ((1 << UCSZ01) | (1 << UCSZ00));
+	UBRR0L = 0x10;
+}
+
+uint8_t Read_USART()
+{
+	while (UCSR0A & (1 << RXC0)) ;
+
+	if (!(UCSR0A & (1 << FE0)))
+	{
+		wdt_reset();
+	}
+
+	return UDR0;
+}
+
+void Write_USART(uint8_t data)
+{
+	while (!(UCSR0A & (1 < UDRE0))) ;
+
+	UDR0 = data;
+}
+
+void read_another_0x20_and_write_0x14()
+{
+	uint8_t data = Read_USART();
+	if (data == 0x20)
+	{
+		Write_USART(0x14);
+	}
+	else
+	{
+		Configure_Watchdog_Timer((1 << WDE));
+		while (1) ;
+	}
+}
+
+void Read_N_Characters(uint8_t count)
+{
+	while (count)
+	{
+		Read_USART();
+		count -= 1;
+	}
+	read_another_0x20_and_write_0x14();
+}
+
+
+static inline void page_erase(uint16_t cursor)
+{
+	asm volatile (
+	"out %0, %1\n\t"
+	"spm\n\t"
+	:
+	: "i" (_SFR_IO_ADDR(__SPM_REG)),
+	  "r" ((uint8_t)(__BOOT_PAGE_ERASE)),
+	  "z" ((uint16_t)(cursor))
+	);
+}
+
+uint8_t ram_buffer[SPM_PAGESIZE];
+
+void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootloader"))) main(void)
+{
+	asm volatile ("eor r1, r1");
+	uint8_t mcusr = MCUSR;
+	uint16_t cursor;
+	MCUSR = 0x00;
+
+	if (mcusr & (1 << EXTRF))
+	{
+		Init_UART();
+		Configure_Watchdog_Timer((1 << WDE) | (1 << WDP2) | (1 << WDP1));
+		wdt_reset();
+		while (1)
+		{
+			uint8_t usart_read_0 = Read_USART();
+			if (usart_read_0 == 0x41)
+			{
+				uint8_t usart_read_1 = Read_USART();
+				read_another_0x20_and_write_0x14();
+				if (usart_read_1 == 0x81 || usart_read_1 == 0x82)
+					Write_USART(0x04);
+				else
+					Write_USART(0x03);
+			}
+			else if (usart_read_0 == 0x42)
+			{
+				Read_N_Characters(0x14);
+			}
+			else if (usart_read_0 == 0x45)
+			{
+				Read_N_Characters(0x05);
+			}
+			else if (usart_read_0 == 0x55)
+			{
+				cursor = 0;
+				cursor = Read_USART();
+				cursor |= (Read_USART() << 8);
+				cursor *= 2;
+				read_another_0x20_and_write_0x14();
+			}
+			else if (usart_read_0 == 0x56)
+			{
+				Read_N_Characters(0x04);
+				Write_USART(0x00);
+			}
+			else if (usart_read_0 == 0x64)
+			{
+				Read_USART();
+				uint8_t usart_read_2 = Read_USART();
+				Read_USART();
+
+				page_erase(cursor);
+
+				for (uint8_t i = 0; i < usart_read_2; i++)
+				{
+					ram_buffer[i] = Read_USART();
+				}
+			}
+
+			Write_USART(0x10);
+		}
+	}
+	else
+	{
+		Go_To_Application_Start();
+	}
+}

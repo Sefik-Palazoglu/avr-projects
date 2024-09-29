@@ -1,20 +1,20 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000L
-OBJECTS    = main.o boot.o boot_init.o
+OBJECTS    = main.o
 
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mshort-calls -mrelax -nostartfiles
 
 all:	main.hex
 
 %.o: %.c
-	$(COMPILE) -c $< -o $@
+	$(COMPILE) -flto -c $< -o $@
 
 clean:
 	rm -f main.hex main.elf $(OBJECTS)
 
 # file targets:
 main.elf: $(OBJECTS)
-	$(COMPILE) -Wl,-T linker.ld -flto -o main.elf $(OBJECTS)
+	$(COMPILE) -Wl,-T linker.ld -Wl,--section-start=.text=0x7E00 -flto -o main.elf $(OBJECTS)
 
 main.hex: main.elf
 	rm -f main.hex
