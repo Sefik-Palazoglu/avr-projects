@@ -4,7 +4,7 @@
 
 void Configure_Watchdog_Timer(uint8_t flags)
 {
-	WDTCSR = ((0x01 << WDCE) | (0x01 << WDE));
+	WDTCSR = (_BV(WDCE) | _BV(WDE));
 	WDTCSR = flags;
 }
 
@@ -21,17 +21,17 @@ void _Noreturn Go_To_Application_Start(void)
 
 void Init_UART(void)
 {
-	UCSR0A = (1 << U2X0);
-	UCSR0B = ((1 << RXEN0) | (1 << TXEN0));
-	UCSR0C = ((1 << UCSZ01) | (1 << UCSZ00));
+	UCSR0A = _BV(U2X0);
+	UCSR0B = (_BV(RXEN0) | _BV(TXEN0));
+	UCSR0C = (_BV(UCSZ01) | _BV(UCSZ00));
 	UBRR0L = 0x10;
 }
 
 uint8_t Read_USART()
 {
-	while (UCSR0A & (1 << RXC0)) ;
+	while (UCSR0A & _BV(RXC0)) ;
 
-	if (!(UCSR0A & (1 << FE0)))
+	if (!(UCSR0A & _BV(FE0)))
 	{
 		wdt_reset();
 	}
@@ -41,7 +41,7 @@ uint8_t Read_USART()
 
 void Write_USART(uint8_t data)
 {
-	while (!(UCSR0A & (1 < UDRE0))) ;
+	while (!(UCSR0A & _BV(UDRE0))) ;
 
 	UDR0 = data;
 }
@@ -55,7 +55,7 @@ void read_another_0x20_and_write_0x14()
 	}
 	else
 	{
-		Configure_Watchdog_Timer((1 << WDE));
+		Configure_Watchdog_Timer(_BV(WDE));
 		while (1) ;
 	}
 }
@@ -92,10 +92,10 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 	uint16_t cursor;
 	MCUSR = 0x00;
 
-	if (mcusr & (1 << EXTRF))
+	if (mcusr & _BV(EXTRF))
 	{
 		Init_UART();
-		Configure_Watchdog_Timer((1 << WDE) | (1 << WDP2) | (1 << WDP1));
+		Configure_Watchdog_Timer(_BV(WDE) | _BV(WDP2) | _BV(WDP1));
 		wdt_reset();
 		while (1)
 		{
