@@ -25,4 +25,4 @@ disasm:	main.elf
 	avr-objdump -d main.elf
 
 tags: *.c
-	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . /usr/lib/gcc/avr/7.3.0/include* /usr/lib/avr/include/
+	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)* $(AVR_INCLUDE_AVR)
