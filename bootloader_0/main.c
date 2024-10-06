@@ -28,9 +28,9 @@ void Init_UART(void)
 
 uint8_t Read_USART()
 {
-	while (UCSR0A & _BV(RXC0)) ;
+	while (bit_is_set(UCSR0A, RXC0)) ;
 
-	if (!(UCSR0A & _BV(FE0)))
+	if (bit_is_clear(UCSR0A, FE0))
 	{
 		wdt_reset();
 	}
@@ -40,7 +40,7 @@ uint8_t Read_USART()
 
 void Write_USART(uint8_t data)
 {
-	while (!(UCSR0A & _BV(UDRE0))) ;
+	while (bit_is_clear(UCSR0A, UDRE0)) ;
 
 	UDR0 = data;
 }
