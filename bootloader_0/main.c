@@ -69,19 +69,6 @@ void Read_N_Characters(uint8_t count)
 	read_another_0x20_and_write_0x14();
 }
 
-
-static inline void page_erase(uint16_t cursor)
-{
-	asm volatile (
-		"out %0, %1\n\t"
-		"spm\n\t"
-		:
-		: "i" (_SFR_IO_ADDR(__SPM_REG)),
-	  	  "r" ((uint8_t)(__BOOT_PAGE_ERASE)),
-	  	  "z" ((uint16_t)(cursor))
-	);
-}
-
 uint8_t ram_buffer[SPM_PAGESIZE];
 
 void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootloader"))) main(void)
@@ -135,12 +122,13 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				uint8_t usart_read_2 = Read_USART();
 				Read_USART();
 
-				page_erase(cursor);
+				boot_page_erase(cursor);
 
 				for (uint8_t i = 0; i < usart_read_2; i++)
 				{
 					ram_buffer[i] = Read_USART();
 				}
+				read_another_0x20_and_write_0x14();
 			}
 
 			Write_USART(0x10);
