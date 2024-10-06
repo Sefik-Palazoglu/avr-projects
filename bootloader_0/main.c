@@ -10,13 +10,12 @@ void Configure_Watchdog_Timer(uint8_t flags)
 
 void _Noreturn Go_To_Application_Start(void)
 {
-	Configure_Watchdog_Timer(0x00); // ignore watchdog timeout
-	// RunApp();
+	Configure_Watchdog_Timer(0x00);
 	asm volatile (
-		"eor r30, r30\n"
-		"eor r31, r31\n"
-		"ijmp\n"
-	);
+		"ijmp\n\t"
+		:
+		: "z" ((uint16_t)(0x0000))
+		);
 }
 
 void Init_UART(void)
@@ -74,12 +73,12 @@ void Read_N_Characters(uint8_t count)
 static inline void page_erase(uint16_t cursor)
 {
 	asm volatile (
-	"out %0, %1\n\t"
-	"spm\n\t"
-	:
-	: "i" (_SFR_IO_ADDR(__SPM_REG)),
-	  "r" ((uint8_t)(__BOOT_PAGE_ERASE)),
-	  "z" ((uint16_t)(cursor))
+		"out %0, %1\n\t"
+		"spm\n\t"
+		:
+		: "i" (_SFR_IO_ADDR(__SPM_REG)),
+	  	  "r" ((uint8_t)(__BOOT_PAGE_ERASE)),
+	  	  "z" ((uint16_t)(cursor))
 	);
 }
 
