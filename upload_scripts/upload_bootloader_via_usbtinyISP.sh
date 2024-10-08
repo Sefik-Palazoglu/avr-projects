@@ -1,15 +1,16 @@
 #!/bin/bash
+#
+# avrdude -p m328p -c usbtiny -v -U lfuse:r:lfuse.hex:h -U hfuse:r:hfuse.hex:h -U efuse:r:efuse.hex:h -U lock:r:lock.hex:h -U signature:r:signature.hex:h -U calibration:r:calibration.hex:h
+
 
 AVRDUDE=avrdude
 
 CONFIG_FILE=/etc/avrdude.conf
 PROCESSOR=atmega328p
-PROGRAMMER=stk500v1
-UPLOAD_PORT=/dev/ttyUSB0
-BAUD_RATE=19200
-AVRDUDE_FLAGS="-C ${CONFIG_FILE} -v -p ${PROCESSOR} -c ${PROGRAMMER} -P ${UPLOAD_PORT} -b ${BAUD_RATE}"
+PROGRAMMER=usbtiny
+AVRDUDE_FLAGS="-C ${CONFIG_FILE} -v -p ${PROCESSOR} -c ${PROGRAMMER}"
 
-BOOTLOADER_PATH=../optiboot_atmega328p.hex
+BOOTLOADER_PATH=/home/losus/Desktop/avr-projects/optiboot_atmega328.hex
 CHIP_ERASE=-e
 
 # No locks
