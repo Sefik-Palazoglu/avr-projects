@@ -166,11 +166,13 @@ PAGE_BUFFER[R13:R12-R13:R12+0x80] = SRAM[0x0100-0x0180]
     7f16:	82 2b       	or	r24, r18                        # R24 = R18 == [X]
     7f18:	93 2b       	or	r25, r19                        # R25 = R19 == [X + 1]
     7f1a:	12 96       	adiw	r26, 0x02	; 2             # X += 2
+boot_page_fill(address: r21:r20, data: r25:r24)
     7f1c:	fa 01       	movw	r30, r20                    # Z = R21:R20 # gets incremented by 2 every iteration
     7f1e:	0c 01       	movw	r0, r24                     # R1:R0 = R25:R24 == [X + 1]:[X]
     7f20:	87 be       	out	0x37, r8	; 55                # SPMCSR = (SELFPRGEN)
     7f22:	e8 95       	spm                                 # store the value in [X + 1]:[X] in the temporary page buffer addressed by Z
     7f24:	11 24       	eor	r1, r1                          # R1 = 0
+do while end
     7f26:	4e 5f       	subi	r20, 0xFE	; 254           
     7f28:	5f 4f       	sbci	r21, 0xFF	; 255           # R21:R20 -= 0xFFFE or R21:R20 += 0x2
     7f2a:	f1 e0       	ldi	r31, 0x01	; 1                 #
