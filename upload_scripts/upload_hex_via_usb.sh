@@ -17,10 +17,14 @@ UPLOAD_PORT=/dev/ttyUSB0
 BAUD_RATE=115200
 AVRDUDE_FLAGS="-C ${CONFIG_FILE} -v -V -p ${PROCESSOR} -c ${PROGRAMMER} -P ${UPLOAD_PORT} -b ${BAUD_RATE} -D"
 
-HEX_PATH=$1
+HEX_PATH=$(realpath "$1")
 
 WRITE_HEX="-U flash:w:${HEX_PATH}:i"
 
-set -x
-$AVRDUDE $AVRDUDE_FLAGS $WRITE_HEX
-set +x
+if [[ -f "$HEX_PATH" ]]; then
+	set -x
+	$AVRDUDE $AVRDUDE_FLAGS $WRITE_HEX
+	set +x
+else
+	echo "Hex file not found: $HEX_PATH"
+fi
