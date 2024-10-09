@@ -1,7 +1,4 @@
 #!/bin/bash
-#
-# avrdude -p m328p -c usbtiny -v -U lfuse:r:lfuse.hex:h -U hfuse:r:hfuse.hex:h -U efuse:r:efuse.hex:h -U lock:r:lock.hex:h -U signature:r:signature.hex:h -U calibration:r:calibration.hex:h
-
 
 AVRDUDE=avrdude
 
@@ -10,7 +7,7 @@ PROCESSOR=atmega328p
 PROGRAMMER=usbtiny
 AVRDUDE_FLAGS="-C ${CONFIG_FILE} -v -p ${PROCESSOR} -c ${PROGRAMMER}"
 
-BOOTLOADER_PATH=/home/losus/Desktop/avr-projects/optiboot_atmega328.hex
+BOOTLOADER_PATH=$(realpath "$1")
 CHIP_ERASE=-e
 
 # No locks
@@ -45,7 +42,11 @@ WRITE_LFUSE="-U lfuse:w:${FUSE_LOW_BYTE}:m"
 WRITE_BOOTLOADER="-U flash:w:${BOOTLOADER_PATH}:i"
 WRITE_LOCK_BOOT_SECTION="-U lock:w:${LOCK_BYTE_LOCK_BOOT_SECTION}:m"
 
-set -x
-$AVRDUDE $AVRDUDE_FLAGS $CHIP_ERASE $WRITE_LOCK_NOLOCKS $WRITE_EFUSE $WRITE_HFUSE $WRITE_LFUSE
-$AVRDUDE $AVRDUDE_FLAGS $WRITE_BOOTLOADER $WRITE_LOCK_BOOT_SECTION
-set +x
+if [[ -f "$BOOTLOADER_PATH" ]]; then
+	set -x
+	$AVRDUDE $AVRDUDE_FLAGS $CHIP_ERASE $WRITE_LOCK_NOLOCKS $WRITE_EFUSE $WRITE_HFUSE $WRITE_LFUSE
+	$AVRDUDE $AVRDUDE_FLAGS $WRITE_BOOTLOADER $WRITE_LOCK_BOOT_SECTION
+	set +x
+else
+	echo "Bootloader not found: $BOOTLOADER_PATH"
+fi
