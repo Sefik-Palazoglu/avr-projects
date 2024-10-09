@@ -69,7 +69,7 @@ void Read_N_Characters(uint8_t count)
 	read_another_0x20_and_write_0x14();
 }
 
-uint8_t ram_buffer[SPM_PAGESIZE];
+uint8_t* ram_buffer = (uint8_t*) RAMSTART;
 
 void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootloader"))) main(void)
 {
@@ -105,9 +105,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			}
 			else if (usart_read_0 == 0x55)
 			{
-				cursor = 0;
-				cursor = Read_USART();
-				cursor |= (Read_USART() << 8);
+				cursor = (uint16_t) Read_USART() | ((uint16_t) Read_USART() << 8);
 				cursor *= 2;
 				read_another_0x20_and_write_0x14();
 			}
@@ -123,12 +121,21 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				Read_USART();
 
 				boot_page_erase(cursor);
-
 				for (uint8_t i = 0; i < usart_read_2; i++)
 				{
 					ram_buffer[i] = Read_USART();
 				}
 				read_another_0x20_and_write_0x14();
+				boot_spm_busy_wait();
+				
+				for (uint8_t i = 0; i < SPM_PAGESIZE; i += 2)
+				{
+					uint16_t data = (uint16_t) ram_buffer[i] | ((uint16_t) ram_buffer[i + 1] << 8);
+					boot_page_fill(cursor + i, data);
+				}
+				boot_page_write(cursor);
+				boot_spm_busy_wait();
+				boot_rww_enable();
 			}
 
 			Write_USART(0x10);
