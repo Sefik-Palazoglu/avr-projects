@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/boot.h>
 #include <avr/wdt.h>
+#include <avr/pgmspace.h>
 
 void Configure_Watchdog_Timer(uint8_t flags)
 {
@@ -28,7 +29,7 @@ void Init_UART(void)
 
 uint8_t Read_USART()
 {
-	while (bit_is_set(UCSR0A, RXC0)) ;
+	while (bit_is_clear(UCSR0A, RXC0)) ;
 
 	if (bit_is_clear(UCSR0A, FE0))
 	{
@@ -136,6 +137,34 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				boot_page_write(cursor);
 				boot_spm_busy_wait();
 				boot_rww_enable();
+			}
+			else if (usart_read_0 == 0x74)
+			{
+				Read_USART();
+				uint8_t usart_read_2 = Read_USART();
+				Read_USART();
+				read_another_0x20_and_write_0x14();
+
+				do {
+					Write_USART(pgm_read_byte_near(cursor++));
+					usart_read_2--;
+				} while (0 != usart_read_2);
+			}
+			else if (usart_read_0 == 0x75)
+			{
+				read_another_0x20_and_write_0x14();
+				Write_USART(0x1E);
+				Write_USART(0x95);
+				Write_USART(0x0F);
+			}
+			else if (usart_read_0 == 0x51)
+			{
+				Configure_Watchdog_Timer(0x08);
+				read_another_0x20_and_write_0x14();
+			}
+			else
+			{
+				read_another_0x20_and_write_0x14();
 			}
 
 			Write_USART(0x10);
