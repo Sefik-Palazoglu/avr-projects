@@ -10,7 +10,7 @@ all:	main.hex
 	$(COMPILE) -flto -c $< -o $@
 
 clean:
-	rm -f main.hex main.elf main.dump $(OBJECTS)
+	rm -f main.hex main.elf main.dump main.elf.dump $(OBJECTS)
 
 # file targets:
 main.elf: $(OBJECTS)
