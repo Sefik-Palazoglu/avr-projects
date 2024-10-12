@@ -67,8 +67,20 @@ void Read_N_Characters(uint8_t count)
 		Read_USART();
 		count -= 1;
 	}
-	read_another_0x20_and_write_0x14();
 }
+
+#define boot_page_erase_small(address)        \
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        "out %0, %1\n\t"                         \
+        "spm\n\t"                                \
+        :                                        \
+        : "i" (_SFR_IO_ADDR(__SPM_REG)),        \
+          "r" ((uint8_t)(__BOOT_PAGE_ERASE)),    \
+          "z" ((uint16_t)(address))              \
+    );                                           \
+}))
 
 uint8_t* ram_buffer = (uint8_t*) RAMSTART;
 
@@ -99,10 +111,12 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			else if (usart_read_0 == 0x42)
 			{
 				Read_N_Characters(0x14);
+				read_another_0x20_and_write_0x14();
 			}
 			else if (usart_read_0 == 0x45)
 			{
 				Read_N_Characters(0x05);
+				read_another_0x20_and_write_0x14();
 			}
 			else if (usart_read_0 == 0x55)
 			{
@@ -113,6 +127,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			else if (usart_read_0 == 0x56)
 			{
 				Read_N_Characters(0x04);
+				read_another_0x20_and_write_0x14();
 				Write_USART(0x00);
 			}
 			else if (usart_read_0 == 0x64)
@@ -121,7 +136,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				uint8_t usart_read_2 = Read_USART();
 				Read_USART();
 
-				boot_page_erase(cursor);
+				boot_page_erase_small(cursor);
 				for (uint8_t i = 0; i < usart_read_2; i++)
 				{
 					ram_buffer[i] = Read_USART();

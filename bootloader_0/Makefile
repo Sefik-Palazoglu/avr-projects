@@ -23,6 +23,7 @@ main.hex: main.elf
 
 disasm:	main.hex
 	avr-objdump -D -s -m avr5 main.hex > main.dump
+	avr-objdump -D -s -m avr5 main.elf > main.elf.dump
 
 tags: *.c
 	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)* $(AVR_INCLUDE_AVR)
