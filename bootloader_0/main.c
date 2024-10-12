@@ -46,7 +46,7 @@ void Write_USART(uint8_t data)
 	UDR0 = data;
 }
 
-void read_another_0x20_and_write_0x14()
+void synchronize_with_stk500()
 {
 	uint8_t data = Read_USART();
 	if (data == 0x20)
@@ -146,7 +146,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			if (usart_read_0 == 0x41)
 			{
 				uint8_t usart_read_1 = Read_USART();
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 				if (usart_read_1 == 0x81 || usart_read_1 == 0x82)
 					Write_USART(0x04);
 				else
@@ -155,23 +155,23 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			else if (usart_read_0 == 0x42)
 			{
 				Read_N_Characters(0x14);
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 			}
 			else if (usart_read_0 == 0x45)
 			{
 				Read_N_Characters(0x05);
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 			}
 			else if (usart_read_0 == 0x55)
 			{
 				cursor = (uint16_t) Read_USART() | ((uint16_t) Read_USART() << 8);
 				cursor *= 2;
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 			}
 			else if (usart_read_0 == 0x56)
 			{
 				Read_N_Characters(0x04);
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 				Write_USART(0x00);
 			}
 			else if (usart_read_0 == 0x64)
@@ -185,7 +185,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				{
 					ram_buffer[i] = Read_USART();
 				}
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 				boot_spm_busy_wait();
 				
 				for (uint8_t i = 0; i < SPM_PAGESIZE; i += 2)
@@ -202,7 +202,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 				Read_USART();
 				uint8_t usart_read_2 = Read_USART();
 				Read_USART();
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 
 				do {
 					Write_USART(pgm_read_byte_near(cursor++));
@@ -211,7 +211,7 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			}
 			else if (usart_read_0 == 0x75)
 			{
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 				Write_USART(0x1E);
 				Write_USART(0x95);
 				Write_USART(0x0F);
@@ -219,11 +219,11 @@ void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootload
 			else if (usart_read_0 == 0x51)
 			{
 				Configure_Watchdog_Timer(0x08);
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 			}
 			else
 			{
-				read_another_0x20_and_write_0x14();
+				synchronize_with_stk500();
 			}
 
 			Write_USART(0x10);

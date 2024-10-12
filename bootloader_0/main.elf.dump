@@ -38,7 +38,7 @@ Disassembly of section .text:
     7e48:	61 f4       	brne	.+24     	; 0x7e62 <main+0x62>
     7e4a:	9a d0       	rcall	.+308    	; 0x7f80 <Read_USART>
     7e4c:	18 2f       	mov	r17, r24
-    7e4e:	a4 d0       	rcall	.+328    	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7e4e:	a4 d0       	rcall	.+328    	; 0x7f98 <synchronize_with_stk500>
     7e50:	11 58       	subi	r17, 0x81	; 129
     7e52:	84 e0       	ldi	r24, 0x04	; 4
     7e54:	12 30       	cpi	r17, 0x02	; 2
@@ -54,7 +54,7 @@ Disassembly of section .text:
     7e68:	8b d0       	rcall	.+278    	; 0x7f80 <Read_USART>
     7e6a:	11 50       	subi	r17, 0x01	; 1
     7e6c:	e9 f7       	brne	.-6      	; 0x7e68 <main+0x68>
-    7e6e:	94 d0       	rcall	.+296    	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7e6e:	94 d0       	rcall	.+296    	; 0x7f98 <synchronize_with_stk500>
     7e70:	f5 cf       	rjmp	.-22     	; 0x7e5c <main+0x5c>
     7e72:	85 34       	cpi	r24, 0x45	; 69
     7e74:	31 f4       	brne	.+12     	; 0x7e82 <main+0x82>
@@ -79,7 +79,7 @@ Disassembly of section .text:
     7e9a:	72 d0       	rcall	.+228    	; 0x7f80 <Read_USART>
     7e9c:	71 d0       	rcall	.+226    	; 0x7f80 <Read_USART>
     7e9e:	70 d0       	rcall	.+224    	; 0x7f80 <Read_USART>
-    7ea0:	7b d0       	rcall	.+246    	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7ea0:	7b d0       	rcall	.+246    	; 0x7f98 <synchronize_with_stk500>
     7ea2:	80 e0       	ldi	r24, 0x00	; 0
     7ea4:	da cf       	rjmp	.-76     	; 0x7e5a <main+0x5a>
     7ea6:	84 36       	cpi	r24, 0x64	; 100
@@ -97,7 +97,7 @@ Disassembly of section .text:
     7ebe:	d3 94       	inc	r13
     7ec0:	c1 16       	cp	r12, r17
     7ec2:	08 f1       	brcs	.+66     	; 0x7f06 <main+0x106>
-    7ec4:	69 d0       	rcall	.+210    	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7ec4:	69 d0       	rcall	.+210    	; 0x7f98 <synchronize_with_stk500>
     7ec6:	07 b6       	in	r0, 0x37	; 55
     7ec8:	00 fc       	sbrc	r0, 0
     7eca:	fd cf       	rjmp	.-6      	; 0x7ec6 <main+0xc6>
@@ -141,7 +141,7 @@ Disassembly of section .text:
     7f16:	34 d0       	rcall	.+104    	; 0x7f80 <Read_USART>
     7f18:	18 2f       	mov	r17, r24
     7f1a:	32 d0       	rcall	.+100    	; 0x7f80 <Read_USART>
-    7f1c:	3d d0       	rcall	.+122    	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7f1c:	3d d0       	rcall	.+122    	; 0x7f98 <synchronize_with_stk500>
     7f1e:	81 2e       	mov	r8, r17
     7f20:	fe 01       	movw	r30, r28
     7f22:	6f 01       	movw	r12, r30
@@ -161,7 +161,7 @@ Disassembly of section .text:
     7f3e:	8e cf       	rjmp	.-228    	; 0x7e5c <main+0x5c>
     7f40:	85 37       	cpi	r24, 0x75	; 117
     7f42:	39 f4       	brne	.+14     	; 0x7f52 <main+0x152>
-    7f44:	29 d0       	rcall	.+82     	; 0x7f98 <read_another_0x20_and_write_0x14>
+    7f44:	29 d0       	rcall	.+82     	; 0x7f98 <synchronize_with_stk500>
     7f46:	8e e1       	ldi	r24, 0x1E	; 30
     7f48:	14 d0       	rcall	.+40     	; 0x7f72 <Write_USART>
     7f4a:	85 e9       	ldi	r24, 0x95	; 149
@@ -199,14 +199,14 @@ Disassembly of section .text:
     7f92:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__DATA_REGION_ORIGIN__+0x66>
     7f96:	08 95       	ret
 
-00007f98 <read_another_0x20_and_write_0x14>:
+00007f98 <synchronize_with_stk500>:
     7f98:	f3 df       	rcall	.-26     	; 0x7f80 <Read_USART>
     7f9a:	80 32       	cpi	r24, 0x20	; 32
-    7f9c:	11 f4       	brne	.+4      	; 0x7fa2 <read_another_0x20_and_write_0x14+0xa>
+    7f9c:	11 f4       	brne	.+4      	; 0x7fa2 <synchronize_with_stk500+0xa>
     7f9e:	84 e1       	ldi	r24, 0x14	; 20
     7fa0:	e8 cf       	rjmp	.-48     	; 0x7f72 <Write_USART>
     7fa2:	88 e1       	ldi	r24, 0x18	; 24
     7fa4:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
     7fa8:	88 e0       	ldi	r24, 0x08	; 8
     7faa:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
-    7fae:	ff cf       	rjmp	.-2      	; 0x7fae <read_another_0x20_and_write_0x14+0x16>
+    7fae:	ff cf       	rjmp	.-2      	; 0x7fae <synchronize_with_stk500+0x16>
