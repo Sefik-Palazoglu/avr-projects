@@ -10,7 +10,7 @@ all:	main.hex
 	$(COMPILE) -flto -c $< -o $@
 
 clean:
-	rm -f main.hex main.elf $(OBJECTS)
+	rm -f main.hex main.elf main.dump $(OBJECTS)
 
 # file targets:
 main.elf: $(OBJECTS)
@@ -21,8 +21,8 @@ main.hex: main.elf
 	avr-objcopy -j .text -j .data -j .bootloader -O ihex main.elf main.hex
 	avr-size --format=avr --mcu=$(DEVICE) main.elf
 
-disasm:	main.elf
-	avr-objdump -d main.elf
+disasm:	main.hex
+	avr-objdump -D -s -m avr5 main.hex > main.dump
 
 tags: *.c
 	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)* $(AVR_INCLUDE_AVR)
