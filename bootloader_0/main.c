@@ -16,7 +16,7 @@ void _Noreturn Go_To_Application_Start(void)
 		"ijmp\n\t"
 		:
 		: "z" ((uint16_t)(0x0000))
-		);
+	);
 }
 
 void Init_UART(void)
@@ -29,7 +29,7 @@ void Init_UART(void)
 
 uint8_t Read_USART()
 {
-	while (bit_is_clear(UCSR0A, RXC0)) ;
+	loop_until_bit_is_set(UCSR0A, RXC0);
 
 	if (bit_is_clear(UCSR0A, FE0))
 	{
@@ -41,7 +41,7 @@ uint8_t Read_USART()
 
 void Write_USART(uint8_t data)
 {
-	while (bit_is_clear(UCSR0A, UDRE0)) ;
+	loop_until_bit_is_set(UCSR0A, UDRE0);
 
 	UDR0 = data;
 }
