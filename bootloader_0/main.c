@@ -11,7 +11,9 @@ void Read_N_Characters(uint8_t count);
 
 uint8_t* ram_buffer = (uint8_t*) RAMSTART;
 
-void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) bootloader_func(void)
+__attribute__ ((used))
+__attribute__ ((section(".text.my_bootloader")))
+void bootloader_func(void)
 {
 	asm volatile ("eor r1, r1");
 	uint8_t mcusr = MCUSR;
@@ -152,6 +154,7 @@ void synchronize_with_stk500()
 	{
 		Configure_Watchdog_Timer(_BV(WDE));
 		while (1) ;
+		__builtin_unreachable();
 	}
 }
 
