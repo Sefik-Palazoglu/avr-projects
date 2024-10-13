@@ -12,11 +12,14 @@ void Configure_Watchdog_Timer(uint8_t flags)
 void _Noreturn Go_To_Application_Start(void)
 {
 	Configure_Watchdog_Timer(0x00);
-	asm volatile (
+	asm volatile 
+	(
 		"ijmp\n\t"
 		:
 		: "z" ((uint16_t)(0x0000))
 	);
+
+	__builtin_unreachable();
 }
 
 void Init_UART(void)
