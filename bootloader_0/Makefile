@@ -4,7 +4,7 @@ OBJECTS    = main.o uart.o
 AVR_GCC    = $(AVR_BIN)/avr-gcc
 AVR_OBJCPY = $(AVR_BIN)/avr-objcopy
 AVR_SIZE   = $(AVR_BIN)/avr-size
-AVR_OBJDMP = $(AVR_BIN)/avr-objdump
+AVR_OBJDMP = $(AVR_BIN_14_1_0)/avr-objdump
 
 COMPILE = $(AVR_GCC) -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
 
@@ -26,8 +26,8 @@ main.hex: main.elf
 	$(AVR_SIZE) main.elf
 
 disasm:	main.hex
-	$(AVR_OBJDMP) -D -s -m avr5 main.hex > main.dump
-	$(AVR_OBJDMP) -D -j .text -m avr5 main.elf > main.elf.dump
+	$(AVR_OBJDMP) -D -s -m avr5 --no-addresses --no-show-raw-insn main.hex > main.dump
+	$(AVR_OBJDMP) -D -j .text -m avr5 --no-addresses --no-show-raw-insn main.elf > main.elf.dump
 
 tags: *.c
 	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)/* $(AVR_INCLUDE_AVR)/
