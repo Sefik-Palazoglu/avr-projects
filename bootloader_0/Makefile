@@ -1,8 +1,12 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000L
 OBJECTS    = main.o uart.o
+AVR_GCC    = $(AVR_BIN)/avr-gcc
+AVR_OBJCPY = $(AVR_BIN)/avr-objcopy
+AVR_SIZE   = $(AVR_BIN)/avr-size
+AVR_OBJDMP = $(AVR_BIN)/avr-objdump
 
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
+COMPILE = $(AVR_GCC) -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
 
 all:	main.hex
 
@@ -18,12 +22,12 @@ main.elf: $(OBJECTS)
 
 main.hex: main.elf
 	rm -f main.hex
-	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
-	avr-size --format=avr --mcu=$(DEVICE) main.elf
+	$(AVR_OBJCPY) -j .text -j .data -O ihex main.elf main.hex
+	$(AVR_SIZE) main.elf
 
 disasm:	main.hex
-	avr-objdump -D -s -m avr5 main.hex > main.dump
-	avr-objdump -D -j .text -m avr5 main.elf > main.elf.dump
+	$(AVR_OBJDMP) -D -s -m avr5 main.hex > main.dump
+	$(AVR_OBJDMP) -D -j .text -m avr5 main.elf > main.elf.dump
 
 tags: *.c
-	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)* $(AVR_INCLUDE_AVR)
+	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)/* $(AVR_INCLUDE_AVR)/
