@@ -26,8 +26,8 @@ void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) boo
 
 		while (1)
 		{
-			uint8_t usart_read_0 = Read_USART();
-			if (usart_read_0 == 0x41) {
+			uint8_t command = Read_USART();
+			if (command == 0x41) {
 
 				uint8_t usart_read_1 = Read_USART();
 				synchronize_with_stk500();
@@ -36,37 +36,37 @@ void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) boo
 				else
 					Write_USART(0x03);
 			}
-			else if (usart_read_0 == 0x42) {
+			else if (command == 0x42) {
 
 				Read_N_Characters(0x14);
 				synchronize_with_stk500();
 			}
-			else if (usart_read_0 == 0x45) {
+			else if (command == 0x45) {
 
 				Read_N_Characters(0x05);
 				synchronize_with_stk500();
 			}
-			else if (usart_read_0 == 0x55) {
+			else if (command == 0x55) {
 
-				cursor = (uint16_t) Read_USART() | ((uint16_t) Read_USART() << 8);
+				cursor = Read_USART() | ((uint16_t) Read_USART() << 8);
 				cursor *= 2;
 				synchronize_with_stk500();
 			}
-			else if (usart_read_0 == 0x56) {
+			else if (command == 0x56) {
 
 				Read_N_Characters(0x04);
 				synchronize_with_stk500();
 				Write_USART(0x00);
 			}
-			else if (usart_read_0 == 0x64) {
+			else if (command == 0x64) {
 
 				Read_USART();
-				uint8_t usart_read_2 = Read_USART();
+				uint8_t program_byte_count = Read_USART();
 				Read_USART();
 
 				boot_page_erase_small(cursor);
 
-				for (uint8_t i = 0; i < usart_read_2; i++)
+				for (uint8_t i = 0; i < program_byte_count; i++)
 				{
 					ram_buffer[i] = Read_USART();
 				}
@@ -76,7 +76,7 @@ void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) boo
 				
 				for (uint8_t i = 0; i < SPM_PAGESIZE; i += 2)
 				{
-					uint16_t data = (uint16_t) ram_buffer[i] | ((uint16_t) ram_buffer[i + 1] << 8);
+					uint16_t data = ram_buffer[i] | ((uint16_t) ram_buffer[i + 1] << 8);
 					boot_page_fill_small(cursor + i, data);
 				}
 
@@ -84,26 +84,26 @@ void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) boo
 				boot_spm_busy_wait();
 				boot_rww_enable_small();
 			}
-			else if (usart_read_0 == 0x74) {
+			else if (command == 0x74) {
 
 				Read_USART();
-				uint8_t usart_read_2 = Read_USART();
+				uint8_t program_byte_count = Read_USART();
 				Read_USART();
 				synchronize_with_stk500();
 
 				do {
 					Write_USART(pgm_read_byte_near(cursor++));
-					usart_read_2--;
-				} while (0 != usart_read_2);
+					program_byte_count--;
+				} while (0 != program_byte_count);
 			}
-			else if (usart_read_0 == 0x75) {
+			else if (command == 0x75) {
 
 				synchronize_with_stk500();
 				Write_USART(0x1E);
 				Write_USART(0x95);
 				Write_USART(0x0F);
 			}
-			else if (usart_read_0 == 0x51) {
+			else if (command == 0x51) {
 
 				Configure_Watchdog_Timer(0x08);
 				synchronize_with_stk500();
