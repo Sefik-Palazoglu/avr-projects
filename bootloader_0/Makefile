@@ -18,7 +18,7 @@ main.elf: $(OBJECTS)
 
 main.hex: main.elf
 	rm -f main.hex
-	avr-objcopy -j .text -j .data -j .bootloader -O ihex main.elf main.hex
+	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
 	avr-size --format=avr --mcu=$(DEVICE) main.elf
 
 disasm:	main.hex
