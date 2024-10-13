@@ -4,12 +4,12 @@ main.elf:     file format elf32-avr
 
 Disassembly of section .text:
 
-00007e00 <main>:
+00007e00 <bootloader_func>:
     7e00:	11 24       	eor	r1, r1
     7e02:	84 b7       	in	r24, 0x34	; 52
     7e04:	14 be       	out	0x34, r1	; 52
     7e06:	81 ff       	sbrs	r24, 1
-    7e08:	ac c0       	rjmp	.+344    	; 0x7f62 <main+0x162>
+    7e08:	ac c0       	rjmp	.+344    	; 0x7f62 <bootloader_func+0x162>
     7e0a:	82 e0       	ldi	r24, 0x02	; 2
     7e0c:	80 93 c0 00 	sts	0x00C0, r24	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
     7e10:	88 e1       	ldi	r24, 0x18	; 24
@@ -35,56 +35,56 @@ Disassembly of section .text:
     7e42:	95 2e       	mov	r9, r21
     7e44:	9d d0       	rcall	.+314    	; 0x7f80 <Read_USART>
     7e46:	81 34       	cpi	r24, 0x41	; 65
-    7e48:	61 f4       	brne	.+24     	; 0x7e62 <main+0x62>
+    7e48:	61 f4       	brne	.+24     	; 0x7e62 <bootloader_func+0x62>
     7e4a:	9a d0       	rcall	.+308    	; 0x7f80 <Read_USART>
     7e4c:	18 2f       	mov	r17, r24
     7e4e:	a4 d0       	rcall	.+328    	; 0x7f98 <synchronize_with_stk500>
     7e50:	11 58       	subi	r17, 0x81	; 129
     7e52:	84 e0       	ldi	r24, 0x04	; 4
     7e54:	12 30       	cpi	r17, 0x02	; 2
-    7e56:	08 f0       	brcs	.+2      	; 0x7e5a <main+0x5a>
+    7e56:	08 f0       	brcs	.+2      	; 0x7e5a <bootloader_func+0x5a>
     7e58:	83 e0       	ldi	r24, 0x03	; 3
     7e5a:	8b d0       	rcall	.+278    	; 0x7f72 <Write_USART>
     7e5c:	80 e1       	ldi	r24, 0x10	; 16
     7e5e:	89 d0       	rcall	.+274    	; 0x7f72 <Write_USART>
-    7e60:	f1 cf       	rjmp	.-30     	; 0x7e44 <main+0x44>
+    7e60:	f1 cf       	rjmp	.-30     	; 0x7e44 <bootloader_func+0x44>
     7e62:	82 34       	cpi	r24, 0x42	; 66
-    7e64:	31 f4       	brne	.+12     	; 0x7e72 <main+0x72>
+    7e64:	31 f4       	brne	.+12     	; 0x7e72 <bootloader_func+0x72>
     7e66:	14 e1       	ldi	r17, 0x14	; 20
     7e68:	8b d0       	rcall	.+278    	; 0x7f80 <Read_USART>
     7e6a:	11 50       	subi	r17, 0x01	; 1
-    7e6c:	e9 f7       	brne	.-6      	; 0x7e68 <main+0x68>
+    7e6c:	e9 f7       	brne	.-6      	; 0x7e68 <bootloader_func+0x68>
     7e6e:	94 d0       	rcall	.+296    	; 0x7f98 <synchronize_with_stk500>
-    7e70:	f5 cf       	rjmp	.-22     	; 0x7e5c <main+0x5c>
+    7e70:	f5 cf       	rjmp	.-22     	; 0x7e5c <bootloader_func+0x5c>
     7e72:	85 34       	cpi	r24, 0x45	; 69
-    7e74:	31 f4       	brne	.+12     	; 0x7e82 <main+0x82>
+    7e74:	31 f4       	brne	.+12     	; 0x7e82 <bootloader_func+0x82>
     7e76:	84 d0       	rcall	.+264    	; 0x7f80 <Read_USART>
     7e78:	83 d0       	rcall	.+262    	; 0x7f80 <Read_USART>
     7e7a:	82 d0       	rcall	.+260    	; 0x7f80 <Read_USART>
     7e7c:	81 d0       	rcall	.+258    	; 0x7f80 <Read_USART>
     7e7e:	80 d0       	rcall	.+256    	; 0x7f80 <Read_USART>
-    7e80:	f6 cf       	rjmp	.-20     	; 0x7e6e <main+0x6e>
+    7e80:	f6 cf       	rjmp	.-20     	; 0x7e6e <bootloader_func+0x6e>
     7e82:	85 35       	cpi	r24, 0x55	; 85
-    7e84:	39 f4       	brne	.+14     	; 0x7e94 <main+0x94>
+    7e84:	39 f4       	brne	.+14     	; 0x7e94 <bootloader_func+0x94>
     7e86:	7c d0       	rcall	.+248    	; 0x7f80 <Read_USART>
     7e88:	c8 2f       	mov	r28, r24
     7e8a:	7a d0       	rcall	.+244    	; 0x7f80 <Read_USART>
     7e8c:	d8 2f       	mov	r29, r24
     7e8e:	cc 0f       	add	r28, r28
     7e90:	dd 1f       	adc	r29, r29
-    7e92:	ed cf       	rjmp	.-38     	; 0x7e6e <main+0x6e>
+    7e92:	ed cf       	rjmp	.-38     	; 0x7e6e <bootloader_func+0x6e>
     7e94:	86 35       	cpi	r24, 0x56	; 86
-    7e96:	39 f4       	brne	.+14     	; 0x7ea6 <main+0xa6>
+    7e96:	39 f4       	brne	.+14     	; 0x7ea6 <bootloader_func+0xa6>
     7e98:	73 d0       	rcall	.+230    	; 0x7f80 <Read_USART>
     7e9a:	72 d0       	rcall	.+228    	; 0x7f80 <Read_USART>
     7e9c:	71 d0       	rcall	.+226    	; 0x7f80 <Read_USART>
     7e9e:	70 d0       	rcall	.+224    	; 0x7f80 <Read_USART>
     7ea0:	7b d0       	rcall	.+246    	; 0x7f98 <synchronize_with_stk500>
     7ea2:	80 e0       	ldi	r24, 0x00	; 0
-    7ea4:	da cf       	rjmp	.-76     	; 0x7e5a <main+0x5a>
+    7ea4:	da cf       	rjmp	.-76     	; 0x7e5a <bootloader_func+0x5a>
     7ea6:	84 36       	cpi	r24, 0x64	; 100
-    7ea8:	09 f0       	breq	.+2      	; 0x7eac <main+0xac>
-    7eaa:	32 c0       	rjmp	.+100    	; 0x7f10 <main+0x110>
+    7ea8:	09 f0       	breq	.+2      	; 0x7eac <bootloader_func+0xac>
+    7eaa:	32 c0       	rjmp	.+100    	; 0x7f10 <bootloader_func+0x110>
     7eac:	69 d0       	rcall	.+210    	; 0x7f80 <Read_USART>
     7eae:	68 d0       	rcall	.+208    	; 0x7f80 <Read_USART>
     7eb0:	18 2f       	mov	r17, r24
@@ -96,11 +96,11 @@ Disassembly of section .text:
     7ebc:	dd 24       	eor	r13, r13
     7ebe:	d3 94       	inc	r13
     7ec0:	c1 16       	cp	r12, r17
-    7ec2:	08 f1       	brcs	.+66     	; 0x7f06 <main+0x106>
+    7ec2:	08 f1       	brcs	.+66     	; 0x7f06 <bootloader_func+0x106>
     7ec4:	69 d0       	rcall	.+210    	; 0x7f98 <synchronize_with_stk500>
     7ec6:	07 b6       	in	r0, 0x37	; 55
     7ec8:	00 fc       	sbrc	r0, 0
-    7eca:	fd cf       	rjmp	.-6      	; 0x7ec6 <main+0xc6>
+    7eca:	fd cf       	rjmp	.-6      	; 0x7ec6 <bootloader_func+0xc6>
     7ecc:	fe 01       	movw	r30, r28
     7ece:	a0 e0       	ldi	r26, 0x00	; 0
     7ed0:	b1 e0       	ldi	r27, 0x01	; 1
@@ -120,23 +120,23 @@ Disassembly of section .text:
     7eec:	a0 38       	cpi	r26, 0x80	; 128
     7eee:	81 e0       	ldi	r24, 0x01	; 1
     7ef0:	b8 07       	cpc	r27, r24
-    7ef2:	79 f7       	brne	.-34     	; 0x7ed2 <main+0xd2>
+    7ef2:	79 f7       	brne	.-34     	; 0x7ed2 <bootloader_func+0xd2>
     7ef4:	fe 01       	movw	r30, r28
     7ef6:	a7 be       	out	0x37, r10	; 55
     7ef8:	e8 95       	spm
     7efa:	07 b6       	in	r0, 0x37	; 55
     7efc:	00 fc       	sbrc	r0, 0
-    7efe:	fd cf       	rjmp	.-6      	; 0x7efa <main+0xfa>
+    7efe:	fd cf       	rjmp	.-6      	; 0x7efa <bootloader_func+0xfa>
     7f00:	97 be       	out	0x37, r9	; 55
     7f02:	e8 95       	spm
-    7f04:	ab cf       	rjmp	.-170    	; 0x7e5c <main+0x5c>
+    7f04:	ab cf       	rjmp	.-170    	; 0x7e5c <bootloader_func+0x5c>
     7f06:	3c d0       	rcall	.+120    	; 0x7f80 <Read_USART>
     7f08:	f6 01       	movw	r30, r12
     7f0a:	81 93       	st	Z+, r24
     7f0c:	6f 01       	movw	r12, r30
-    7f0e:	d8 cf       	rjmp	.-80     	; 0x7ec0 <main+0xc0>
+    7f0e:	d8 cf       	rjmp	.-80     	; 0x7ec0 <bootloader_func+0xc0>
     7f10:	84 37       	cpi	r24, 0x74	; 116
-    7f12:	b1 f4       	brne	.+44     	; 0x7f40 <main+0x140>
+    7f12:	b1 f4       	brne	.+44     	; 0x7f40 <bootloader_func+0x140>
     7f14:	35 d0       	rcall	.+106    	; 0x7f80 <Read_USART>
     7f16:	34 d0       	rcall	.+104    	; 0x7f80 <Read_USART>
     7f18:	18 2f       	mov	r17, r24
@@ -153,27 +153,27 @@ Disassembly of section .text:
     7f2e:	8a 94       	dec	r8
     7f30:	f6 01       	movw	r30, r12
     7f32:	81 10       	cpse	r8, r1
-    7f34:	f6 cf       	rjmp	.-20     	; 0x7f22 <main+0x122>
+    7f34:	f6 cf       	rjmp	.-20     	; 0x7f22 <bootloader_func+0x122>
     7f36:	21 96       	adiw	r28, 0x01	; 1
     7f38:	11 50       	subi	r17, 0x01	; 1
     7f3a:	c1 0f       	add	r28, r17
     7f3c:	d1 1d       	adc	r29, r1
-    7f3e:	8e cf       	rjmp	.-228    	; 0x7e5c <main+0x5c>
+    7f3e:	8e cf       	rjmp	.-228    	; 0x7e5c <bootloader_func+0x5c>
     7f40:	85 37       	cpi	r24, 0x75	; 117
-    7f42:	39 f4       	brne	.+14     	; 0x7f52 <main+0x152>
+    7f42:	39 f4       	brne	.+14     	; 0x7f52 <bootloader_func+0x152>
     7f44:	29 d0       	rcall	.+82     	; 0x7f98 <synchronize_with_stk500>
     7f46:	8e e1       	ldi	r24, 0x1E	; 30
     7f48:	14 d0       	rcall	.+40     	; 0x7f72 <Write_USART>
     7f4a:	85 e9       	ldi	r24, 0x95	; 149
     7f4c:	12 d0       	rcall	.+36     	; 0x7f72 <Write_USART>
     7f4e:	8f e0       	ldi	r24, 0x0F	; 15
-    7f50:	84 cf       	rjmp	.-248    	; 0x7e5a <main+0x5a>
+    7f50:	84 cf       	rjmp	.-248    	; 0x7e5a <bootloader_func+0x5a>
     7f52:	81 35       	cpi	r24, 0x51	; 81
-    7f54:	09 f0       	breq	.+2      	; 0x7f58 <main+0x158>
-    7f56:	8b cf       	rjmp	.-234    	; 0x7e6e <main+0x6e>
+    7f54:	09 f0       	breq	.+2      	; 0x7f58 <bootloader_func+0x158>
+    7f56:	8b cf       	rjmp	.-234    	; 0x7e6e <bootloader_func+0x6e>
     7f58:	00 93 60 00 	sts	0x0060, r16	; 0x800060 <__DATA_REGION_ORIGIN__>
     7f5c:	f0 92 60 00 	sts	0x0060, r15	; 0x800060 <__DATA_REGION_ORIGIN__>
-    7f60:	86 cf       	rjmp	.-244    	; 0x7e6e <main+0x6e>
+    7f60:	86 cf       	rjmp	.-244    	; 0x7e6e <bootloader_func+0x6e>
     7f62:	88 e1       	ldi	r24, 0x18	; 24
     7f64:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
     7f68:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <__DATA_REGION_ORIGIN__>
