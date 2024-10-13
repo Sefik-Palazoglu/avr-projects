@@ -1,0 +1,230 @@
+
+main.hex:     file format ihex
+
+Contents of section .sec1:
+ 7e00 112484b7 14be81ff a8c082e0 8093c000  .$..............
+ 7e10 88e18093 c10096e0 9093c200 90e19093  ................
+ 7e20 c4008093 60008ee0 80936000 a89508e1  ....`.....`.....
+ 7e30 28e0d22e 33e0c32e bb24b394 45e0a42e  (...3....$..E...
+ 7e40 51e1952e 99d08134 61f496d0 182fa0d0  Q......4a..../..
+ 7e50 115884e0 123008f0 83e087d0 80e185d0  .X...0..........
+ 7e60 f1cf8234 31f414e1 87d01150 e9f790d0  ...41......P....
+ 7e70 f5cf8534 31f480d0 7fd07ed0 7dd07cd0  ...41.....~.}.|.
+ 7e80 f6cf8535 39f478d0 c82f76d0 d82fcc0f  ...59.x../v../..
+ 7e90 dd1fedcf 863539f4 6fd06ed0 6dd06cd0  .....59.o.n.m.l.
+ 7ea0 77d080e0 dacf8436 09f02fc0 65d064d0  w......6../.e.d.
+ 7eb0 182f62d0 fe01c7be e895e12c ff24f394  ./b........,.$..
+ 7ec0 e116f0f0 65d007b6 00fcfdcf fe01a0e0  ....e...........
+ 7ed0 b1e01196 9c911197 8c910c01 b7bee895  ................
+ 7ee0 11241296 3296a038 81e0b807 91f7fe01  .$..2..8........
+ 7ef0 a7bee895 07b600fc fdcf97be e895aecf  ................
+ 7f00 3bd0f701 81937f01 dbcf8437 a9f434d0  ;..........7..4.
+ 7f10 33d0182f 31d03cd0 7e018c2e 810ef701  3../1.<.~.......
+ 7f20 8fefe81a f80a8491 20d08e10 f8cf2196  ........ .....!.
+ 7f30 1150c10f d11d92cf 853739f4 29d08ee1  .P.......79.)...
+ 7f40 14d085e9 12d08fe0 88cf8135 09f08fcf  ...........5....
+ 7f50 00936000 d0926000 8acf88e1 80936000  ..`...`.......`.
+ 7f60 10926000 f0e0e0e0 09949091 c00095ff  ..`.............
+ 7f70 fccf8093 c6000895 8091c000 87fffccf  ................
+ 7f80 8091c000 84fd01c0 a8958091 c6000895  ................
+ 7f90 f3df8032 11f484e1 e8cf88e1 80936000  ...2..........`.
+ 7fa0 88e08093 6000ffcf                    ....`...        
+
+Disassembly of section .sec1:
+
+<.sec1>:
+	eor	r1, r1
+	in	r24, 0x34	; 52
+	out	0x34, r1	; 52
+	sbrs	r24, 1
+	rjmp	.+336    	;  
+	ldi	r24, 0x02	; 2
+	sts	0x00C0, r24	;  
+	ldi	r24, 0x18	; 24
+	sts	0x00C1, r24	;  
+	ldi	r25, 0x06	; 6
+	sts	0x00C2, r25	;  
+	ldi	r25, 0x10	; 16
+	sts	0x00C4, r25	;  
+	sts	0x0060, r24	;  
+	ldi	r24, 0x0E	; 14
+	sts	0x0060, r24	;  
+	wdr
+	ldi	r16, 0x18	; 24
+	ldi	r18, 0x08	; 8
+	mov	r13, r18
+	ldi	r19, 0x03	; 3
+	mov	r12, r19
+	eor	r11, r11
+	inc	r11
+	ldi	r20, 0x05	; 5
+	mov	r10, r20
+	ldi	r21, 0x11	; 17
+	mov	r9, r21
+	rcall	.+306    	;  
+	cpi	r24, 0x41	; 65
+	brne	.+24     	;  
+	rcall	.+300    	;  
+	mov	r17, r24
+	rcall	.+320    	;  
+	subi	r17, 0x81	; 129
+	ldi	r24, 0x04	; 4
+	cpi	r17, 0x02	; 2
+	brcs	.+2      	;  
+	ldi	r24, 0x03	; 3
+	rcall	.+270    	;  
+	ldi	r24, 0x10	; 16
+	rcall	.+266    	;  
+	rjmp	.-30     	;  
+	cpi	r24, 0x42	; 66
+	brne	.+12     	;  
+	ldi	r17, 0x14	; 20
+	rcall	.+270    	;  
+	subi	r17, 0x01	; 1
+	brne	.-6      	;  
+	rcall	.+288    	;  
+	rjmp	.-22     	;  
+	cpi	r24, 0x45	; 69
+	brne	.+12     	;  
+	rcall	.+256    	;  
+	rcall	.+254    	;  
+	rcall	.+252    	;  
+	rcall	.+250    	;  
+	rcall	.+248    	;  
+	rjmp	.-20     	;  
+	cpi	r24, 0x55	; 85
+	brne	.+14     	;  
+	rcall	.+240    	;  
+	mov	r28, r24
+	rcall	.+236    	;  
+	mov	r29, r24
+	add	r28, r28
+	adc	r29, r29
+	rjmp	.-38     	;  
+	cpi	r24, 0x56	; 86
+	brne	.+14     	;  
+	rcall	.+222    	;  
+	rcall	.+220    	;  
+	rcall	.+218    	;  
+	rcall	.+216    	;  
+	rcall	.+238    	;  
+	ldi	r24, 0x00	; 0
+	rjmp	.-76     	;  
+	cpi	r24, 0x64	; 100
+	breq	.+2      	;  
+	rjmp	.+94     	;  
+	rcall	.+202    	;  
+	rcall	.+200    	;  
+	mov	r17, r24
+	rcall	.+196    	;  
+	movw	r30, r28
+	out	0x37, r12	; 55
+	spm
+	mov	r14, r1
+	eor	r15, r15
+	inc	r15
+	cp	r14, r17
+	brcs	.+60     	;  
+	rcall	.+202    	;  
+	in	r0, 0x37	; 55
+	sbrc	r0, 0
+	rjmp	.-6      	;  
+	movw	r30, r28
+	ldi	r26, 0x00	; 0
+	ldi	r27, 0x01	; 1
+	adiw	r26, 0x01	; 1
+	ld	r25, X
+	sbiw	r26, 0x01	; 1
+	ld	r24, X
+	movw	r0, r24
+	out	0x37, r11	; 55
+	spm
+	eor	r1, r1
+	adiw	r26, 0x02	; 2
+	adiw	r30, 0x02	; 2
+	cpi	r26, 0x80	; 128
+	ldi	r24, 0x01	; 1
+	cpc	r27, r24
+	brne	.-28     	;  
+	movw	r30, r28
+	out	0x37, r10	; 55
+	spm
+	in	r0, 0x37	; 55
+	sbrc	r0, 0
+	rjmp	.-6      	;  
+	out	0x37, r9	; 55
+	spm
+	rjmp	.-164    	;  
+	rcall	.+118    	;  
+	movw	r30, r14
+	st	Z+, r24
+	movw	r14, r30
+	rjmp	.-74     	;  
+	cpi	r24, 0x74	; 116
+	brne	.+42     	;  
+	rcall	.+104    	;  
+	rcall	.+102    	;  
+	mov	r17, r24
+	rcall	.+98     	;  
+	rcall	.+120    	;  
+	movw	r14, r28
+	mov	r8, r28
+	add	r8, r17
+	movw	r30, r14
+	ldi	r24, 0xFF	; 255
+	sub	r14, r24
+	sbc	r15, r24
+	lpm	r24, Z
+	rcall	.+64     	;  
+	cpse	r8, r14
+	rjmp	.-16     	;  
+	adiw	r28, 0x01	; 1
+	subi	r17, 0x01	; 1
+	add	r28, r17
+	adc	r29, r1
+	rjmp	.-220    	;  
+	cpi	r24, 0x75	; 117
+	brne	.+14     	;  
+	rcall	.+82     	;  
+	ldi	r24, 0x1E	; 30
+	rcall	.+40     	;  
+	ldi	r24, 0x95	; 149
+	rcall	.+36     	;  
+	ldi	r24, 0x0F	; 15
+	rjmp	.-240    	;  
+	cpi	r24, 0x51	; 81
+	breq	.+2      	;  
+	rjmp	.-226    	;  
+	sts	0x0060, r16	;  
+	sts	0x0060, r13	;  
+	rjmp	.-236    	;  
+	ldi	r24, 0x18	; 24
+	sts	0x0060, r24	;  
+	sts	0x0060, r1	;  
+	ldi	r31, 0x00	; 0
+	ldi	r30, 0x00	; 0
+	ijmp
+	lds	r25, 0x00C0	;  
+	sbrs	r25, 5
+	rjmp	.-8      	;  
+	sts	0x00C6, r24	;  
+	ret
+	lds	r24, 0x00C0	;  
+	sbrs	r24, 7
+	rjmp	.-8      	;  
+	lds	r24, 0x00C0	;  
+	sbrc	r24, 4
+	rjmp	.+2      	;  
+	wdr
+	lds	r24, 0x00C6	;  
+	ret
+	rcall	.-26     	;  
+	cpi	r24, 0x20	; 32
+	brne	.+4      	;  
+	ldi	r24, 0x14	; 20
+	rjmp	.-48     	;  
+	ldi	r24, 0x18	; 24
+	sts	0x0060, r24	;  
+	ldi	r24, 0x08	; 8
+	sts	0x0060, r24	;  
+	rjmp	.-2      	;  
