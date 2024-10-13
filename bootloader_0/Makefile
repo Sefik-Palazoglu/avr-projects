@@ -2,7 +2,7 @@ DEVICE     = atmega328p
 CLOCK      = 16000000L
 OBJECTS    = main.o
 
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mshort-calls -mrelax -nostartfiles
+COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
 
 all:	main.hex
 
