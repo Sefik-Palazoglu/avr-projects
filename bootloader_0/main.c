@@ -71,7 +71,7 @@ void Read_N_Characters(uint8_t count)
 
 uint8_t* ram_buffer = (uint8_t*) RAMSTART;
 
-void __attribute__ ((used)) _Noreturn __attribute__ ((section(".text.my_bootloader"))) main(void)
+void __attribute__ ((used)) __attribute__ ((section(".text.my_bootloader"))) main(void)
 {
 	asm volatile ("eor r1, r1");
 	uint8_t mcusr = MCUSR;
