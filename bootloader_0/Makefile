@@ -28,6 +28,3 @@ main.hex: main.elf
 disasm:	main.hex
 	$(AVR_OBJDMP) -D -s -m avr5 --no-addresses --no-show-raw-insn main.hex > main.dump
 	$(AVR_OBJDMP) -D -j .text -m avr5 --no-addresses --no-show-raw-insn main.elf > main.elf.dump
-
-tags: *.c
-	ctags -R --exclude=io?*.h --exclude-exception=iom328p.h . $(AVR_INCLUDE)/* $(AVR_INCLUDE_AVR)/
