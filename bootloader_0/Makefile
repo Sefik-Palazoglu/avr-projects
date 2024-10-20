@@ -1,6 +1,6 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000L
-OBJECTS    = main.o uart.o
+OBJECTS    = src/main.o src/uart.o
 AVR_GCC    = $(AVR_BIN)/avr-gcc
 AVR_OBJCPY = $(AVR_BIN)/avr-objcopy
 AVR_SIZE   = $(AVR_BIN)/avr-size
