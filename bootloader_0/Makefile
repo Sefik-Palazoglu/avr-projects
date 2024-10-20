@@ -8,7 +8,7 @@ AVR_OBJDMP = $(AVR_BIN_14_1_0)/avr-objdump
 
 COMPILE = $(AVR_GCC) -I./include -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
 
-all:	main.hex
+all:	bin/main.hex
 
 %.o: %.c
 	$(COMPILE) -flto -c $< -o $@
@@ -17,14 +17,14 @@ clean:
 	rm -f main.hex main.elf main.dump main.elf.dump $(OBJECTS)
 
 # file targets:
-main.elf: $(OBJECTS)
-	$(COMPILE) -Wl,-T linker/linker.ld -Wl,--section-start=.text=0x7E00 -o main.elf $(OBJECTS)
+bin/main.elf: $(OBJECTS)
+	$(COMPILE) -Wl,-T linker/linker.ld -Wl,--section-start=.text=0x7E00 -o bin/main.elf $(OBJECTS)
 
-main.hex: main.elf
-	rm -f main.hex
-	$(AVR_OBJCPY) -j .text -j .data -O ihex main.elf main.hex
-	$(AVR_SIZE) main.elf
+bin/main.hex: bin/main.elf
+	rm -f bin/main.hex
+	$(AVR_OBJCPY) -j .text -j .data -O ihex bin/main.elf bin/main.hex
+	$(AVR_SIZE) bin/main.elf
 
-disasm:	main.hex
+disasm:	bin/main.hex bin/main.elf
 	$(AVR_OBJDMP) -D -s -m avr5 --no-addresses --no-show-raw-insn main.hex > main.dump
 	$(AVR_OBJDMP) -D -j .text -m avr5 --no-addresses --no-show-raw-insn main.elf > main.elf.dump
