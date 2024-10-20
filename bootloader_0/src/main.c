@@ -1,12 +1,12 @@
 #include <avr/io.h>
-#include <avr/wdt.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
+#include <sys/types.h>
 #include "small_boot.h"
 #include "uart.h"
 #include "command.h"
+#include "wdt_unsafe.h"
 
-void configure_wdt_unsafe(uint8_t flags);
-void disable_wdt_unsafe(void);
 void _Noreturn Go_To_Application_Start(void);
 void synchronize_with_stk500();
 void Read_N_Characters(uint8_t count);
@@ -25,7 +25,7 @@ void bootloader_func(void)
   if (mcusr & _BV(EXTRF))
   {
     Init_UART();
-    configure_wdt_unsafe(_BV(WDE) | WDTO_1S);
+    enable_wdt_timeout1s_unsafe();
     wdt_reset();
 
     while (1)
@@ -109,7 +109,7 @@ void bootloader_func(void)
       }
       else if (command == Cmnd_STK_LEAVE_PROGMODE) {
 
-        configure_wdt_unsafe(0x08 | WDTO_15MS);
+        enable_wdt_timeout15ms_unsafe();
         synchronize_with_stk500();
       }
       else {
@@ -124,17 +124,6 @@ void bootloader_func(void)
 
     Go_To_Application_Start();
   }
-}
-
-void configure_wdt_unsafe(uint8_t flags)
-{
-  _WD_CONTROL_REG = (_BV(_WD_CHANGE_BIT) | _BV(WDE));
-  _WD_CONTROL_REG = flags;
-}
-
-void disable_wdt_unsafe(void)
-{
-  configure_wdt_unsafe(0x00);
 }
 
 void _Noreturn Go_To_Application_Start(void)
@@ -159,7 +148,7 @@ void synchronize_with_stk500()
   }
   else
   {
-    configure_wdt_unsafe(_BV(WDE));
+    enable_wdt_timeout15ms_unsafe();
     while (1) ;
     __builtin_unreachable();
   }
