@@ -6,7 +6,7 @@ AVR_OBJCPY = $(AVR_BIN)/avr-objcopy
 AVR_SIZE   = $(AVR_BIN)/avr-size
 AVR_OBJDMP = $(AVR_BIN_14_1_0)/avr-objdump
 
-COMPILE = $(AVR_GCC) -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
+COMPILE = $(AVR_GCC) -I./include -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -mrelax -nostartfiles
 
 all:	main.hex
 
