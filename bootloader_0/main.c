@@ -16,154 +16,154 @@ __attribute__ ((used))
 __attribute__ ((section(".text.my_bootloader")))
 void bootloader_func(void)
 {
-	asm volatile ("eor r1, r1");
-	uint8_t mcusr = MCUSR;
-	uint16_t cursor;
-	MCUSR = 0x00;
+  asm volatile ("eor r1, r1");
+  uint8_t mcusr = MCUSR;
+  uint16_t cursor;
+  MCUSR = 0x00;
 
-	if (mcusr & _BV(EXTRF))
-	{
-		Init_UART();
-		Configure_Watchdog_Timer(_BV(WDE) | _BV(WDP2) | _BV(WDP1));
-		wdt_reset();
+  if (mcusr & _BV(EXTRF))
+  {
+    Init_UART();
+    Configure_Watchdog_Timer(_BV(WDE) | _BV(WDP2) | _BV(WDP1));
+    wdt_reset();
 
-		while (1)
-		{
-			uint8_t command = Read_USART();
-			if (command == Cmnd_STK_GET_PARAMETER) {
+    while (1)
+    {
+      uint8_t command = Read_USART();
+      if (command == Cmnd_STK_GET_PARAMETER) {
 
-				uint8_t parameter = Read_USART();
-				synchronize_with_stk500();
-				if (parameter == Parm_STK_SW_MAJOR || parameter == Parm_STK_SW_MINOR)
-					Write_USART(0x04);
-				else
-					Write_USART(0x03);
-			}
-			else if (command == Cmnd_STK_SET_DEVICE) {
+        uint8_t parameter = Read_USART();
+        synchronize_with_stk500();
+        if (parameter == Parm_STK_SW_MAJOR || parameter == Parm_STK_SW_MINOR)
+          Write_USART(0x04);
+        else
+          Write_USART(0x03);
+      }
+      else if (command == Cmnd_STK_SET_DEVICE) {
 
-				Read_N_Characters(0x14);
-				synchronize_with_stk500();
-			}
-			else if (command == Cmnd_SET_DEVICE_EXT) {
+        Read_N_Characters(0x14);
+        synchronize_with_stk500();
+      }
+      else if (command == Cmnd_SET_DEVICE_EXT) {
 
-				Read_N_Characters(0x05);
-				synchronize_with_stk500();
-			}
-			else if (command == Cmnd_STK_LOAD_ADDRESS) {
+        Read_N_Characters(0x05);
+        synchronize_with_stk500();
+        }
+      else if (command == Cmnd_STK_LOAD_ADDRESS) {
 
-				cursor = Read_USART() | ((uint16_t) Read_USART() << 8);
-				cursor *= 2;
-				synchronize_with_stk500();
-			}
-			else if (command == Cmnd_STK_UNIVERSAL) {
+        cursor = Read_USART() | ((uint16_t) Read_USART() << 8);
+        cursor *= 2;
+        synchronize_with_stk500();
+      }
+      else if (command == Cmnd_STK_UNIVERSAL) {
 
-				Read_N_Characters(0x04);
-				synchronize_with_stk500();
-				Write_USART(0x00);
-			}
-			else if (command == Cmnd_STK_PROG_PAGE) {
+        Read_N_Characters(0x04);
+        synchronize_with_stk500();
+        Write_USART(0x00);
+      }
+      else if (command == Cmnd_STK_PROG_PAGE) {
 
-				uint8_t __attribute ((unused)) bytes_high = Read_USART();
-				uint8_t bytes_low = Read_USART();
-				uint8_t __attribute ((unused)) memtype = Read_USART();
+        uint8_t __attribute ((unused)) bytes_high = Read_USART();
+        uint8_t bytes_low = Read_USART();
+        uint8_t __attribute ((unused)) memtype = Read_USART();
 
-				boot_page_erase_small(cursor);
+        boot_page_erase_small(cursor);
 
-				for (uint8_t i = 0; i < bytes_low; i++)
-				{
-					ram_buffer[i] = Read_USART();
-				}
+        for (uint8_t i = 0; i < bytes_low; i++)
+        {
+          ram_buffer[i] = Read_USART();
+        }
 
-				synchronize_with_stk500();
-				boot_spm_busy_wait();
-				
-				for (uint8_t i = 0; i < SPM_PAGESIZE; i += 2)
-				{
-					uint16_t data = ram_buffer[i] | ((uint16_t) ram_buffer[i + 1] << 8);
-					boot_page_fill_small(cursor + i, data);
-				}
+        synchronize_with_stk500();
+        boot_spm_busy_wait();
 
-				boot_page_write_small(cursor);
-				boot_spm_busy_wait();
-				boot_rww_enable_small();
-			}
-			else if (command == Cmnd_STK_READ_PAGE) {
+        for (uint8_t i = 0; i < SPM_PAGESIZE; i += 2)
+        {
+          uint16_t data = ram_buffer[i] | ((uint16_t) ram_buffer[i + 1] << 8);
+          boot_page_fill_small(cursor + i, data);
+        }
 
-				Read_USART();
-				uint8_t program_byte_count = Read_USART();
-				Read_USART();
-				synchronize_with_stk500();
+        boot_page_write_small(cursor);
+        boot_spm_busy_wait();
+        boot_rww_enable_small();
+      }
+      else if (command == Cmnd_STK_READ_PAGE) {
 
-				do {
-					Write_USART(pgm_read_byte_near(cursor++));
-					program_byte_count--;
-				} while (0 != program_byte_count);
-			}
-			else if (command == Cmnd_STK_READ_SIGN) {
+        Read_USART();
+        uint8_t program_byte_count = Read_USART();
+        Read_USART();
+        synchronize_with_stk500();
 
-				synchronize_with_stk500();
-				Write_USART(0x1E);
-				Write_USART(0x95);
-				Write_USART(0x0F);
-			}
-			else if (command == Cmnd_STK_LEAVE_PROGMODE) {
+        do {
+          Write_USART(pgm_read_byte_near(cursor++));
+          program_byte_count--;
+        } while (0 != program_byte_count);
+      }
+      else if (command == Cmnd_STK_READ_SIGN) {
 
-				Configure_Watchdog_Timer(0x08);
-				synchronize_with_stk500();
-			}
-			else {
+        synchronize_with_stk500();
+        Write_USART(0x1E);
+        Write_USART(0x95);
+        Write_USART(0x0F);
+      }
+      else if (command == Cmnd_STK_LEAVE_PROGMODE) {
 
-				synchronize_with_stk500();
-			}
+        Configure_Watchdog_Timer(0x08);
+        synchronize_with_stk500();
+      }
+      else {
 
-			Write_USART(Resp_STK_OK);
-		}
-	}
-	else {
+        synchronize_with_stk500();
+      }
 
-		Go_To_Application_Start();
-	}
+      Write_USART(Resp_STK_OK);
+    }
+  }
+  else {
+
+    Go_To_Application_Start();
+  }
 }
 
 void Configure_Watchdog_Timer(uint8_t flags)
 {
-	WDTCSR = (_BV(WDCE) | _BV(WDE));
-	WDTCSR = flags;
+  WDTCSR = (_BV(WDCE) | _BV(WDE));
+  WDTCSR = flags;
 }
 
 void _Noreturn Go_To_Application_Start(void)
 {
-	Configure_Watchdog_Timer(0x00);
-	asm volatile 
-	(
-		"ijmp\n\t"
-		:
-		: "z" ((uint16_t)(0x0000))
-	);
+  Configure_Watchdog_Timer(0x00);
+  asm volatile 
+  (
+    "ijmp\n\t"
+    :
+    : "z" ((uint16_t)(0x0000))
+  );
 
-	__builtin_unreachable();
+  __builtin_unreachable();
 }
 
 void synchronize_with_stk500()
 {
-	uint8_t data = Read_USART();
-	if (data == Sync_CRC_EOP)
-	{
-		Write_USART(Resp_STK_INSYNC);
-	}
-	else
-	{
-		Configure_Watchdog_Timer(_BV(WDE));
-		while (1) ;
-		__builtin_unreachable();
-	}
+  uint8_t data = Read_USART();
+  if (data == Sync_CRC_EOP)
+  {
+    Write_USART(Resp_STK_INSYNC);
+  }
+  else
+  {
+    Configure_Watchdog_Timer(_BV(WDE));
+    while (1) ;
+    __builtin_unreachable();
+  }
 }
 
 void Read_N_Characters(uint8_t count)
 {
-	while (count)
-	{
-		Read_USART();
-		count -= 1;
-	}
+  while (count)
+  {
+    Read_USART();
+    count -= 1;
+  }
 }
