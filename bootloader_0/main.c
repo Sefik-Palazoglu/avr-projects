@@ -5,8 +5,8 @@
 #include "uart.h"
 #include "command.h"
 
-void Configure_Watchdog_Timer(uint8_t flags);
-void disable_wdt(void);
+void configure_wdt_unsafe(uint8_t flags);
+void disable_wdt_unsafe(void);
 void _Noreturn Go_To_Application_Start(void);
 void synchronize_with_stk500();
 void Read_N_Characters(uint8_t count);
@@ -25,7 +25,7 @@ void bootloader_func(void)
   if (mcusr & _BV(EXTRF))
   {
     Init_UART();
-    Configure_Watchdog_Timer(_BV(WDE) | WDTO_1S);
+    configure_wdt_unsafe(_BV(WDE) | WDTO_1S);
     wdt_reset();
 
     while (1)
@@ -109,7 +109,7 @@ void bootloader_func(void)
       }
       else if (command == Cmnd_STK_LEAVE_PROGMODE) {
 
-        Configure_Watchdog_Timer(0x08 | WDTO_15MS);
+        configure_wdt_unsafe(0x08 | WDTO_15MS);
         synchronize_with_stk500();
       }
       else {
@@ -126,20 +126,20 @@ void bootloader_func(void)
   }
 }
 
-void Configure_Watchdog_Timer(uint8_t flags)
+void configure_wdt_unsafe(uint8_t flags)
 {
   _WD_CONTROL_REG = (_BV(_WD_CHANGE_BIT) | _BV(WDE));
   _WD_CONTROL_REG = flags;
 }
 
-void disable_wdt(void)
+void disable_wdt_unsafe(void)
 {
-  Configure_Watchdog_Timer(0x00);
+  configure_wdt_unsafe(0x00);
 }
 
 void _Noreturn Go_To_Application_Start(void)
 {
-  disable_wdt();
+  disable_wdt_unsafe();
   asm volatile 
   (
     "ijmp\n\t"
@@ -159,7 +159,7 @@ void synchronize_with_stk500()
   }
   else
   {
-    Configure_Watchdog_Timer(_BV(WDE));
+    configure_wdt_unsafe(_BV(WDE));
     while (1) ;
     __builtin_unreachable();
   }
