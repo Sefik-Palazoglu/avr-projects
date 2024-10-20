@@ -18,7 +18,7 @@ clean:
 
 # file targets:
 main.elf: $(OBJECTS)
-	$(COMPILE) -Wl,-T linker.ld -Wl,--section-start=.text=0x7E00 -o main.elf $(OBJECTS)
+	$(COMPILE) -Wl,-T linker/linker.ld -Wl,--section-start=.text=0x7E00 -o main.elf $(OBJECTS)
 
 main.hex: main.elf
 	rm -f main.hex
