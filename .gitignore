@@ -7,6 +7,9 @@
 *.obj
 *.elf
 
+# Object file dumps
+*.dump
+
 # Linker output
 *.ilk
 *.map
