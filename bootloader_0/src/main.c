@@ -98,9 +98,9 @@ void bootloader_func(void)
       else if (command == Cmnd_STK_READ_SIGN) {
 
         synchronize_with_stk500();
-        write_usart(0x1E);
-        write_usart(0x95);
-        write_usart(0x0F);
+        write_usart(SIGNATURE_0);
+        write_usart(SIGNATURE_1);
+        write_usart(SIGNATURE_2);
       }
       else if (command == Cmnd_STK_LEAVE_PROGMODE) {
 
