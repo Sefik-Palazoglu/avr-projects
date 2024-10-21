@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avr/wdt.h>
 #include <sys/types.h>
 #include "small_boot.h"
 #include "uart.h"
@@ -26,7 +25,7 @@ void bootloader_func(void)
   {
     Init_UART();
     enable_wdt_timeout1s_unsafe();
-    wdt_reset();
+    wdt_reset_unsafe();
 
     while (1)
     {
