@@ -1,6 +1,5 @@
-#include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <sys/types.h>
+#include "io.h"
 #include "small_boot.h"
 #include "uart.h"
 #include "command.h"
@@ -10,34 +9,31 @@ void _Noreturn Go_To_Application_Start(void);
 void synchronize_with_stk500();
 void Read_N_Characters(uint8_t count);
 
-uint8_t* ram_buffer = (uint8_t*) RAMSTART;
-
 __attribute__ ((used))
 __attribute__ ((section(".text.my_bootloader")))
 void bootloader_func(void)
 {
   asm volatile ("eor r1, r1");
-  uint8_t mcusr = MCUSR;
+  uint8_t mcusr = read_and_zero_mcusr();
   uint16_t cursor;
-  MCUSR = 0x00;
 
-  if (mcusr & _BV(EXTRF))
+  if (was_external_reset(mcusr))
   {
-    Init_UART();
+    init_uart();
     enable_wdt_timeout1s_unsafe();
     wdt_reset_unsafe();
 
     while (1)
     {
-      uint8_t command = Read_USART();
+      uint8_t command = read_usart();
       if (command == Cmnd_STK_GET_PARAMETER) {
 
-        uint8_t parameter = Read_USART();
+        uint8_t parameter = read_usart();
         synchronize_with_stk500();
         if (parameter == Parm_STK_SW_MAJOR || parameter == Parm_STK_SW_MINOR)
-          Write_USART(0x04);
+          write_usart(0x04);
         else
-          Write_USART(0x03);
+          write_usart(0x03);
       }
       else if (command == Cmnd_STK_SET_DEVICE) {
 
@@ -51,7 +47,7 @@ void bootloader_func(void)
         }
       else if (command == Cmnd_STK_LOAD_ADDRESS) {
 
-        cursor = Read_USART() | ((uint16_t) Read_USART() << 8);
+        cursor = read_usart() | ((uint16_t) read_usart() << 8);
         cursor *= 2;
         synchronize_with_stk500();
       }
@@ -59,19 +55,19 @@ void bootloader_func(void)
 
         Read_N_Characters(0x04);
         synchronize_with_stk500();
-        Write_USART(0x00);
+        write_usart(0x00);
       }
       else if (command == Cmnd_STK_PROG_PAGE) {
 
-        uint8_t __attribute ((unused)) bytes_high = Read_USART();
-        uint8_t bytes_low = Read_USART();
-        uint8_t __attribute ((unused)) memtype = Read_USART();
+        uint8_t __attribute ((unused)) bytes_high = read_usart();
+        uint8_t bytes_low = read_usart();
+        uint8_t __attribute ((unused)) memtype = read_usart();
 
         boot_page_erase_small(cursor);
 
         for (uint8_t i = 0; i < bytes_low; i++)
         {
-          ram_buffer[i] = Read_USART();
+          ram_buffer[i] = read_usart();
         }
 
         synchronize_with_stk500();
@@ -89,22 +85,22 @@ void bootloader_func(void)
       }
       else if (command == Cmnd_STK_READ_PAGE) {
 
-        Read_USART();
-        uint8_t program_byte_count = Read_USART();
-        Read_USART();
+        read_usart();
+        uint8_t program_byte_count = read_usart();
+        read_usart();
         synchronize_with_stk500();
 
         do {
-          Write_USART(pgm_read_byte_near(cursor++));
+          write_usart(pgm_read_byte_near(cursor++));
           program_byte_count--;
         } while (0 != program_byte_count);
       }
       else if (command == Cmnd_STK_READ_SIGN) {
 
         synchronize_with_stk500();
-        Write_USART(0x1E);
-        Write_USART(0x95);
-        Write_USART(0x0F);
+        write_usart(0x1E);
+        write_usart(0x95);
+        write_usart(0x0F);
       }
       else if (command == Cmnd_STK_LEAVE_PROGMODE) {
 
@@ -116,7 +112,7 @@ void bootloader_func(void)
         synchronize_with_stk500();
       }
 
-      Write_USART(Resp_STK_OK);
+      write_usart(Resp_STK_OK);
     }
   }
   else {
@@ -140,10 +136,10 @@ void _Noreturn Go_To_Application_Start(void)
 
 void synchronize_with_stk500()
 {
-  uint8_t data = Read_USART();
+  uint8_t data = read_usart();
   if (data == Sync_CRC_EOP)
   {
-    Write_USART(Resp_STK_INSYNC);
+    write_usart(Resp_STK_INSYNC);
   }
   else
   {
@@ -157,7 +153,7 @@ void Read_N_Characters(uint8_t count)
 {
   while (count)
   {
-    Read_USART();
+    read_usart();
     count -= 1;
   }
 }
