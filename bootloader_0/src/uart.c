@@ -2,7 +2,7 @@
 #include <avr/wdt.h>
 #include "uart.h"
 
-void Init_UART(void)
+void init_uart(void)
 {
   UCSR0A = _BV(U2X0);
   UCSR0B = (_BV(RXEN0) | _BV(TXEN0));
@@ -10,7 +10,7 @@ void Init_UART(void)
   UBRR0L = 0x10;
 }
 
-uint8_t Read_USART()
+uint8_t read_usart()
 {
   loop_until_bit_is_set(UCSR0A, RXC0);
 
@@ -22,7 +22,7 @@ uint8_t Read_USART()
   return UDR0;
 }
 
-void Write_USART(uint8_t data)
+void write_usart(uint8_t data)
 {
   loop_until_bit_is_set(UCSR0A, UDRE0);
 
