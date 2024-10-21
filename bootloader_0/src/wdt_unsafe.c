@@ -25,3 +25,8 @@ void enable_wdt_timeout1s_unsafe(void)
 {
   configure_wdt_unsafe(_BV(WDE) | WDTO_1S);
 }
+
+void wdt_reset_unsafe(void)
+{
+  wdt_reset();
+}
