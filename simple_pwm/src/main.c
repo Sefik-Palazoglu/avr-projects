@@ -2,8 +2,6 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
-uint16_t x = 0;
-
 int main(void)
 {
   // set PB5 LED as output
@@ -12,11 +10,13 @@ int main(void)
   // enable timer ctc
   TCCR0A |= _BV(WGM01);
 
-  // set output compare
-  OCR0A = 125;
+  // set output compare to 12
+  OCR0A = 12;
 
-  // set prescaler to 1024
-  TCCR0B = _BV(CS02) | _BV(CS00);
+  // set prescaler to 64
+  TCCR0B = _BV(CS01) | _BV(CS00);
+
+  // interrupt every 48 microseconds
 
   // enable interrupts
   sei();
@@ -31,13 +31,15 @@ int main(void)
 
 ISR(TIMER0_COMPA_vect)
 {
+  static uint16_t x = 0;
+
   x++;
-  if (125 == x)
+  if (1100 == x)
   {
     x = 0;
     PORTB |= _BV(PORTB5);
   }
-  else if (100 == x)
+  else if (1 == x)
   {
     PORTB &= ~_BV(PORTB5);
   }
