@@ -4,7 +4,7 @@ INC_DIR    = include
 
 DEVICE     = atmega328p
 CLOCK      = 16000000L
-OBJECTS    = $(SRC_DIR)/main.o $(SRC_DIR)/uart.o
+OBJECTS    = $(SRC_DIR)/main.o
 AVR_GCC    = $(AVR_BIN)/avr-gcc
 AVR_OBJCPY = $(AVR_BIN)/avr-objcopy
 AVR_SIZE   = $(AVR_BIN)/avr-size
@@ -31,7 +31,7 @@ $(BIN_DIR)/main.hex: $(BIN_DIR)/main.elf
 disasm:	$(BIN_DIR)/main.hex.dump $(BIN_DIR)/main.elf.dump
 
 $(BIN_DIR)/main.hex.dump: $(BIN_DIR)/main.hex
-	$(AVR_OBJDMP) -D -s -m avr5 --no-addresses --no-show-raw-insn $(BIN_DIR)/main.hex > $(BIN_DIR)/main.hex.dump
+	$(AVR_OBJDMP) -D -s -m avr5 $(BIN_DIR)/main.hex > $(BIN_DIR)/main.hex.dump
 
 $(BIN_DIR)/main.elf.dump: $(BIN_DIR)/main.elf
-	$(AVR_OBJDMP) -D -j .text -m avr5 --no-addresses --no-show-raw-insn $(BIN_DIR)/main.elf > $(BIN_DIR)/main.elf.dump
+	$(AVR_OBJDMP) -D -j .text -m avr5 $(BIN_DIR)/main.elf > $(BIN_DIR)/main.elf.dump
